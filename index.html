@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Learn with Ms.Thúy - Luyện Nghe Chép Chính Tả</title>
+<meta name="description" content="Website luyện nghe chép chính tả tiếng Anh chuyên nghiệp" />
+
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="container">
+    <div class="header-content">
+      <div class="logo">
+        <div class="logo-icon">🎧</div>
+        <div class="logo-text">
+          Learn with Ms.Thúy
+          <small>Listening Dictation</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <h1>Luyện nghe <span class="text-gradient">chép chính tả</span></h1>
+    <p>Nghe, chép và kiểm tra từng câu. Cải thiện kỹ năng listening mỗi ngày cùng Ms.Thúy 🌸</p>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-value" id="totalLessons">0</div>
+        <div class="hero-stat-label">Bài nghe</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-value">💡</div>
+        <div class="hero-stat-label">Gợi ý thông minh</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-value">📊</div>
+        <div class="hero-stat-label">Thống kê chi tiết</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COURSES LIST -->
+<section class="container">
+  <h2 class="section-title">📚 Danh sách bài nghe</h2>
+  <div id="coursesList" class="courses-grid">
+    <div class="loading">
+      <div class="spinner"></div>
+      <div>Đang tải danh sách bài nghe...</div>
+    </div>
+  </div>
+</section>
+
+<!-- Toast container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="script.js"></script>
+<script>
+/* =========================================================
+   HOMEPAGE LOGIC
+   ========================================================= */
+async function loadArticles() {
+  const container = document.getElementById('coursesList');
+
+  try {
+    const res = await fetch('data/articles.json?t=' + Date.now());
+    if (!res.ok) throw new Error('Không thể tải articles.json');
+    const articles = await res.json();
+
+    document.getElementById('totalLessons').textContent = articles.length;
+
+    if (!Array.isArray(articles) || articles.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state" style="grid-column: 1/-1;">
+          <div class="empty-state-icon">📭</div>
+          <h3>Chưa có bài nghe nào</h3>
+          <p>Vui lòng thêm file JSON vào thư mục data/</p>
+        </div>`;
+      return;
+    }
+
+    container.innerHTML = articles.map((article, index) => {
+      const colorClasses = ['', 'blue', 'green', 'orange'];
+      const colorClass = colorClasses[index % colorClasses.length];
+
+      return `
+        <div class="course-card" onclick="openLesson('${article.id}', '${article.dataFile}')">
+          <div class="course-cover ${colorClass}">${article.emoji || '🎧'}</div>
+          <div class="course-body">
+            <div class="course-title">${escapeHtml(article.title)}</div>
+            <div class="course-desc">${escapeHtml(article.description || '')}</div>
+            <div class="course-meta">
+              <span class="badge">📖 ${escapeHtml(article.level || 'All levels')}</span>
+              <span class="badge">⏱️ ${escapeHtml(article.duration || '--')}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  } catch (e) {
+    console.error(e);
+    container.innerHTML = `
+      <div class="empty-state" style="grid-column: 1/-1;">
+        <div class="empty-state-icon">⚠️</div>
+        <h3>Lỗi tải dữ liệu</h3>
+        <p style="margin-bottom: 16px;">${escapeHtml(e.message)}</p>
+        <p style="font-size: 0.85rem;">Đảm bảo file <code>data/articles.json</code> tồn tại.</p>
+      </div>`;
+  }
+}
+
+function openLesson(id, dataFile) {
+  window.location.href = `listening.html?id=${encodeURIComponent(id)}&data=${encodeURIComponent(dataFile)}`;
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// Init
+loadArticles();
+</script>
+
+</body>
+</html>
