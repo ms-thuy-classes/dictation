@@ -116,6 +116,7 @@
 <div class="toast-container" id="toastContainer"></div>
 
 <script src="script.js"></script>
+<script src="script.js"></script>
 <script>
 const state = {
   lesson: null,
@@ -182,8 +183,23 @@ function loadCurrentSentence() {
   document.getElementById('nextBtn').style.display = 'none';
 
   renderWordInputs();
-  updateProgress();
+  updateProgress();       // <-- ĐÃ BỔ SUNG LẠI
   updateHintCounter();
+}
+
+// HÀM CẬP NHẬT THANH TIẾN TRÌNH (Đã thêm lại)
+function updateProgress() {
+  const total = state.lesson.sentences.length;
+  const current = state.currentSentenceIndex;
+  const percent = Math.round((current / total) * 100);
+
+  document.getElementById('progressText').textContent = `Câu ${current + 1}/${total}`;
+  document.getElementById('progressPercent').textContent = percent + '%';
+  document.getElementById('progressFill').style.width = percent + '%';
+}
+
+function updateHintCounter() {
+  document.getElementById('hintCounter').textContent = `💡 ${state.hintsUsedThisSentence}/3`;
 }
 
 function renderWordInputs() {
@@ -196,23 +212,17 @@ function renderWordInputs() {
     const wrapper = document.createElement('div');
     wrapper.className = 'word-input-wrapper';
 
-    // 1. Ô input để gõ
     const input = document.createElement('input');
     input.type = 'text';
     input.className = 'word-input';
     input.dataset.index = index;
-    input.dataset.correct = word; // Lưu đáp án đúng để so sánh sau
+    input.dataset.correct = word;
     input.placeholder = '_'.repeat(word.length);
     input.autocomplete = "off";
     input.spellcheck = false;
     
-    // Sự kiện gõ phím thông minh
     input.addEventListener('keydown', (e) => handleWordKeydown(e, index, words.length));
-    input.addEventListener('input', () => {
-      // Tự động viết thường hoặc giữ nguyên, tùy chỉnh nếu cần
-    });
 
-    // 2. Nút con mắt (Hint)
     const btn = document.createElement('button');
     btn.className = 'hint-word-btn';
     btn.id = `hint-btn-${index}`;
@@ -225,32 +235,27 @@ function renderWordInputs() {
     container.appendChild(wrapper);
   });
 
-  // Auto-focus vào ô đầu tiên khi vào câu mới
   setTimeout(() => {
     const firstInput = container.querySelector('.word-input');
     if (firstInput) firstInput.focus();
   }, 100);
 }
 
-// Xử lý phím bấm trong ô input
 function handleWordKeydown(e, currentIndex, totalWords) {
   const inputs = document.querySelectorAll('.word-input');
   
-  // Nhấn SPACE: Chuyển sang ô kế tiếp
   if (e.key === ' ' || e.key === 'Spacebar') {
-    e.preventDefault(); // Không cho phép gõ dấu cách
+    e.preventDefault();
     if (currentIndex < totalWords - 1) {
       inputs[currentIndex + 1].focus();
     }
   }
-  // Nhấn BACKSPACE: Nếu ô đang trống, lùi về ô trước
   else if (e.key === 'Backspace' && e.target.value === '') {
     e.preventDefault();
     if (currentIndex > 0) {
       inputs[currentIndex - 1].focus();
     }
   }
-  // Nhấn ENTER: Nếu là ô cuối cùng thì tự động Check, nếu không thì xuống ô dưới
   else if (e.key === 'Enter') {
     e.preventDefault();
     if (currentIndex < totalWords - 1) {
@@ -259,7 +264,6 @@ function handleWordKeydown(e, currentIndex, totalWords) {
       checkCurrentSentence();
     }
   }
-  // Nhấn TAB: Chuyển ô (mặc định của browser, nhưng giữ lại để rõ ràng)
   else if (e.key === 'Tab') {
     e.preventDefault();
     const nextIndex = e.shiftKey ? currentIndex - 1 : currentIndex + 1;
@@ -273,19 +277,17 @@ function handleWordKeydown(e, currentIndex, totalWords) {
 // LOGIC HINT (CON MẮT)
 // =========================================================
 function revealWord(index, correctWord, inputEl, btnEl) {
-  if (inputEl.disabled) return; // Đã được gợi ý rồi
+  if (inputEl.disabled) return;
   
   if (state.hintsUsedThisSentence >= 3) {
     toast('🚫 Bạn đã dùng hết 3 lượt Hint cho câu này.', 'warning');
     return;
   }
 
-  // Điền từ đúng vào ô input
   inputEl.value = correctWord;
   inputEl.classList.add('revealed-by-hint');
-  inputEl.disabled = true; // Khóa ô lại, không cho sửa
+  inputEl.disabled = true;
 
-  // Đổi nút thành dấu check
   btnEl.innerHTML = '✓';
   btnEl.classList.add('revealed');
   btnEl.disabled = true;
@@ -299,7 +301,6 @@ function revealWord(index, correctWord, inputEl, btnEl) {
 
   toast(`💡 Đã mở từ "${correctWord}"`, 'info');
   
-  // Tự động focus sang ô kế tiếp nếu có
   const inputs = document.querySelectorAll('.word-input');
   if (index < inputs.length - 1) {
     inputs[index + 1].focus();
@@ -316,34 +317,10 @@ function disableAllHintButtons() {
     }
   });
 }
-  function updateProgress(){
-
-    const total = state.lesson.sentences.length;
-
-    const current = state.currentSentenceIndex + 1;
-
-    document.getElementById("progressText").textContent =
-        `Câu ${current}/${total}`;
-
-    const percent = Math.round(current / total * 100);
-
-    document.getElementById("progressPercent").textContent =
-        percent + "%";
-
-    document.getElementById("progressFill").style.width =
-        percent + "%";
-
-}
-
-function updateHintCounter() {
-  document.getElementById('hintCounter').textContent = `💡 ${state.hintsUsedThisSentence}/3`;
-}
 
 function clearAllInputs() {
   const inputs = document.querySelectorAll('.word-input:not(.revealed-by-hint)');
-  inputs.forEach(input => {
-    input.value = '';
-  });
+  inputs.forEach(input => { input.value = ''; });
   const firstInput = document.querySelector('.word-input');
   if (firstInput) firstInput.focus();
 }
@@ -370,12 +347,12 @@ function checkCurrentSentence() {
       html += `<span class="word-wrong">${escapeHtml(input.value || '...')}</span> `;
       input.classList.add('input-wrong');
     }
-    input.disabled = true; // Khóa tất cả ô sau khi check
+    input.disabled = true;
   });
 
   const totalWords = inputs.length;
   const accuracy = totalWords > 0 ? (correctCount / totalWords) * 100 : 0;
-  const isCorrect = accuracy >= 80; // Ngưỡng 80%
+  const isCorrect = accuracy >= 80;
 
   state.results.push({
     sentenceId: state.lesson.sentences[state.currentSentenceIndex].id,
@@ -427,7 +404,7 @@ function nextSentence() {
 }
 
 // =========================================================
-// FINAL RESULT (Giữ nguyên logic cũ, chỉ điều chỉnh hiển thị)
+// FINAL RESULT
 // =========================================================
 function showFinalResult() {
   document.getElementById('sentenceCard').style.display = 'none';
@@ -521,7 +498,7 @@ function retryLesson() {
 }
 
 // =========================================================
-// AUDIO & UTILS (Giữ nguyên)
+// AUDIO & UTILS
 // =========================================================
 function setupInteractiveWaveform() {
   const container = document.getElementById('waveformContainer');
@@ -635,6 +612,7 @@ function toast(msg, type = 'info') {
   }, 3000);
 }
 
+// Khởi chạy
 initLesson();
 </script>
 </body>
