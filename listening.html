@@ -183,7 +183,52 @@ async function initLesson() {
     state.audioEl.src = lesson.audio;
 
     // Generate waveform
-    generateWaveform();
+  function generateWaveform(){
+
+    const waveform=document.getElementById("waveform");
+
+    waveform.innerHTML="";
+
+    const bars=60;
+
+    for(let i=0;i<bars;i++){
+
+        const bar=document.createElement("div");
+
+        bar.className="wave-bar";
+
+        bar.style.height=(20+Math.random()*80)+"%";
+
+        bar.dataset.index=i;
+
+        waveform.appendChild(bar);
+
+    }
+
+    waveform.onclick=seekByClick;
+
+}
+    function seekByClick(e){
+
+    const waveform=document.getElementById("waveform");
+
+    const rect=waveform.getBoundingClientRect();
+
+    const x=e.clientX-rect.left;
+
+    const percent=x/rect.width;
+
+    const audio=state.audioEl;
+
+    if(!audio.duration)return;
+
+    audio.currentTime=percent*audio.duration;
+
+    audio.play();
+
+    document.getElementById("playBtn").textContent="⏸";
+
+}
 
     // Load first sentence
     loadCurrentSentence();
@@ -589,10 +634,14 @@ function setupAudioEvents() {
     const bars = document.querySelectorAll('.wave-bar');
     const progress = duration ? current / duration : 0;
     const activeCount = Math.floor(progress * bars.length);
-    bars.forEach((bar, i) => {
-      bar.classList.toggle('active', i < activeCount);
-    });
-  });
+   bars.forEach((bar,i)=>{
+
+bar.classList.toggle(
+"active",
+i<=activeCount
+);
+
+});
 
   audio.addEventListener('ended', function() {
     document.getElementById('playBtn').textContent = '▶';
