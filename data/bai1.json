@@ -1,54 +1,199 @@
+```json
 {
   "id": "bai1",
-  "title": "Daily Meeting",
+  "title": "Work and Travel",
   "audio": "audio/bai1.mp3",
-  "maxHints": 5,
+  "maxHints": 3,
   "sentences": [
     {
       "id": 1,
-      "text": "Good morning everyone.",
-      "translation": "Chào mọi người.",
+      "text": "Hello!",
+      "translation": "Xin chào!",
       "vocab": [
-        {"word": "morning", "meaning": "buổi sáng"},
-        {"word": "everyone", "meaning": "mọi người"}
+        {"word": "hello", "meaning": "xin chào"}
       ]
     },
     {
       "id": 2,
-      "text": "Thank you for coming to this meeting.",
-      "translation": "Cảm ơn mọi người đã đến cuộc họp này.",
+      "text": "I'm Tom, a freelance web designer from the UK.",
+      "translation": "Tôi là Tom, một nhà thiết kế web tự do đến từ Anh.",
       "vocab": [
-        {"word": "meeting", "meaning": "cuộc họp"},
-        {"word": "coming", "meaning": "đến"}
+        {"word": "freelance", "meaning": "tự do"},
+        {"word": "designer", "meaning": "nhà thiết kế"},
+        {"word": "UK", "meaning": "Vương quốc Anh"}
       ]
     },
     {
       "id": 3,
-      "text": "Today we will discuss the new project.",
-      "translation": "Hôm nay chúng ta sẽ thảo luận về dự án mới.",
+      "text": "A few years ago, I told myself, \"Hey, I work online and I love travelling.\"",
+      "translation": "Vài năm trước, tôi tự nhủ: \"Này, mình làm việc trực tuyến và mình thích du lịch.\"",
       "vocab": [
-        {"word": "discuss", "meaning": "thảo luận"},
-        {"word": "project", "meaning": "dự án"}
+        {"word": "online", "meaning": "trực tuyến"},
+        {"word": "travelling", "meaning": "du lịch"}
       ]
     },
     {
       "id": 4,
-      "text": "The meeting will start at nine tomorrow.",
-      "translation": "Cuộc họp sẽ bắt đầu lúc 9 giờ ngày mai.",
+      "text": "So I don't have to stay home and put up with the cold, wet weather.",
+      "translation": "Vì vậy tôi không phải ở nhà và chịu đựng thời tiết lạnh lẽo, ẩm ướt.",
       "vocab": [
-        {"word": "start", "meaning": "bắt đầu"},
-        {"word": "tomorrow", "meaning": "ngày mai"}
+        {"word": "put up with", "meaning": "chịu đựng"},
+        {"word": "wet", "meaning": "ẩm ướt"}
       ]
     },
     {
       "id": 5,
-      "text": "Please sign the attendance sheet.",
-      "translation": "Vui lòng ký vào bảng điểm danh.",
+      "text": "I decided to experience other cultures.",
+      "translation": "Tôi quyết định trải nghiệm những nền văn hóa khác.",
       "vocab": [
-        {"word": "sign", "meaning": "ký"},
-        {"word": "attendance", "meaning": "điểm danh"},
-        {"word": "sheet", "meaning": "tờ giấy/bảng"}
+        {"word": "experience", "meaning": "trải nghiệm"},
+        {"word": "cultures", "meaning": "các nền văn hóa"}
+      ]
+    },
+    {
+      "id": 6,
+      "text": "I wanted to live in countries with a more pleasant climate, like Portugal or Thailand.",
+      "translation": "Tôi muốn sống ở những quốc gia có khí hậu dễ chịu hơn như Bồ Đào Nha hoặc Thái Lan.",
+      "vocab": [
+        {"word": "pleasant", "meaning": "dễ chịu"},
+        {"word": "climate", "meaning": "khí hậu"}
+      ]
+    },
+    {
+      "id": 7,
+      "text": "Not only that, but I could also save lots of money.",
+      "translation": "Không chỉ vậy, tôi còn có thể tiết kiệm rất nhiều tiền.",
+      "vocab": [
+        {"word": "save", "meaning": "tiết kiệm"},
+        {"word": "lots of", "meaning": "rất nhiều"}
+      ]
+    },
+    {
+      "id": 8,
+      "text": "I could do that by working in cheaper countries.",
+      "translation": "Tôi có thể làm điều đó bằng cách làm việc ở những quốc gia có chi phí rẻ hơn.",
+      "vocab": [
+        {"word": "cheaper", "meaning": "rẻ hơn"},
+        {"word": "countries", "meaning": "các quốc gia"}
+      ]
+    },
+    {
+      "id": 9,
+      "text": "This new lifestyle started a few months later.",
+      "translation": "Lối sống mới này bắt đầu vài tháng sau đó.",
+      "vocab": [
+        {"word": "lifestyle", "meaning": "lối sống"},
+        {"word": "started", "meaning": "bắt đầu"}
+      ]
+    },
+    {
+      "id": 10,
+      "text": "I usually stay a few months in each place.",
+      "translation": "Tôi thường ở mỗi nơi vài tháng.",
+      "vocab": [
+        {"word": "usually", "meaning": "thường"},
+        {"word": "each place", "meaning": "mỗi nơi"}
+      ]
+    },
+    {
+      "id": 11,
+      "text": "Sometimes I stay for more than a year.",
+      "translation": "Đôi khi tôi ở hơn một năm.",
+      "vocab": [
+        {"word": "more than", "meaning": "hơn"},
+        {"word": "year", "meaning": "năm"}
+      ]
+    },
+    {
+      "id": 12,
+      "text": "I use coworking spaces and local cafés to work during the day.",
+      "translation": "Tôi sử dụng các không gian làm việc chung và quán cà phê địa phương để làm việc vào ban ngày.",
+      "vocab": [
+        {"word": "coworking space", "meaning": "không gian làm việc chung"},
+        {"word": "local", "meaning": "địa phương"}
+      ]
+    },
+    {
+      "id": 13,
+      "text": "I often attend language classes or join different courses in the evenings.",
+      "translation": "Tôi thường tham gia các lớp học ngôn ngữ hoặc các khóa học khác nhau vào buổi tối.",
+      "vocab": [
+        {"word": "attend", "meaning": "tham gia"},
+        {"word": "courses", "meaning": "khóa học"}
+      ]
+    },
+    {
+      "id": 14,
+      "text": "It's a great way to meet new people.",
+      "translation": "Đó là một cách tuyệt vời để gặp gỡ những người mới.",
+      "vocab": [
+        {"word": "great way", "meaning": "cách tuyệt vời"},
+        {"word": "meet", "meaning": "gặp gỡ"}
+      ]
+    },
+    {
+      "id": 15,
+      "text": "My job is flexible.",
+      "translation": "Công việc của tôi rất linh hoạt.",
+      "vocab": [
+        {"word": "flexible", "meaning": "linh hoạt"},
+        {"word": "job", "meaning": "công việc"}
+      ]
+    },
+    {
+      "id": 16,
+      "text": "I can choose my own work hours.",
+      "translation": "Tôi có thể tự chọn giờ làm việc của mình.",
+      "vocab": [
+        {"word": "choose", "meaning": "lựa chọn"},
+        {"word": "work hours", "meaning": "giờ làm việc"}
+      ]
+    },
+    {
+      "id": 17,
+      "text": "But I still have to keep a schedule and be organised.",
+      "translation": "Nhưng tôi vẫn phải tuân theo lịch trình và có tổ chức.",
+      "vocab": [
+        {"word": "schedule", "meaning": "lịch trình"},
+        {"word": "organised", "meaning": "có tổ chức"}
+      ]
+    },
+    {
+      "id": 18,
+      "text": "Otherwise, it becomes hard to stay in touch with clients and manage time zones.",
+      "translation": "Nếu không, sẽ rất khó để giữ liên lạc với khách hàng và quản lý múi giờ.",
+      "vocab": [
+        {"word": "stay in touch", "meaning": "giữ liên lạc"},
+        {"word": "time zones", "meaning": "múi giờ"}
+      ]
+    },
+    {
+      "id": 19,
+      "text": "I really enjoy combining work and travel.",
+      "translation": "Tôi thực sự thích kết hợp công việc và du lịch.",
+      "vocab": [
+        {"word": "combine", "meaning": "kết hợp"},
+        {"word": "travel", "meaning": "du lịch"}
+      ]
+    },
+    {
+      "id": 20,
+      "text": "It is not always easy.",
+      "translation": "Điều đó không phải lúc nào cũng dễ dàng.",
+      "vocab": [
+        {"word": "always", "meaning": "luôn luôn"},
+        {"word": "easy", "meaning": "dễ dàng"}
+      ]
+    },
+    {
+      "id": 21,
+      "text": "But learning about new cultures, enjoying the sunshine, and meeting interesting people make it worth it.",
+      "translation": "Nhưng việc tìm hiểu những nền văn hóa mới, tận hưởng ánh nắng và gặp gỡ những con người thú vị khiến tất cả đều xứng đáng.",
+      "vocab": [
+        {"word": "sunshine", "meaning": "ánh nắng"},
+        {"word": "worth it", "meaning": "đáng giá"}
       ]
     }
   ]
 }
+```
