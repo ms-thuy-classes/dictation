@@ -316,6 +316,24 @@ function disableAllHintButtons() {
     }
   });
 }
+  function updateProgress(){
+
+    const total = state.lesson.sentences.length;
+
+    const current = state.currentSentenceIndex + 1;
+
+    document.getElementById("progressText").textContent =
+        `Câu ${current}/${total}`;
+
+    const percent = Math.round(current / total * 100);
+
+    document.getElementById("progressPercent").textContent =
+        percent + "%";
+
+    document.getElementById("progressFill").style.width =
+        percent + "%";
+
+}
 
 function updateHintCounter() {
   document.getElementById('hintCounter').textContent = `💡 ${state.hintsUsedThisSentence}/3`;
