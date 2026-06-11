@@ -1066,3 +1066,54 @@ h4 { font-size: 1.125rem; }
   .action-row { flex-direction: column; }
   .action-row .btn { width: 100%; }
 }
+/* =========================================================
+   AUDIO PLAYER INTERACTIVE WAVEFORM
+   ========================================================= */
+.waveform-container {
+  position: relative;
+  cursor: pointer; /* Hiển thị con trỏ click */
+  padding: 10px 0; /* Tăng vùng click dễ dàng hơn */
+}
+
+.time-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  background: var(--text-primary);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  pointer-events: none; /* Không chặn sự kiện chuột */
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  z-index: 10;
+  white-space: nowrap;
+  margin-bottom: 8px;
+}
+
+.time-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--text-primary);
+}
+
+.time-tooltip.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-4px);
+}
+
+/* Hiệu ứng hover cho các thanh sóng âm */
+.waveform-container:hover .wave-bar {
+  opacity: 0.7;
+}
+.waveform-container:hover .wave-bar.active {
+  opacity: 1;
+}
