@@ -102,7 +102,7 @@
         oninput="autoResize(this)"></textarea>
 
       <!-- Hint Display -->
-      <div class="hint-display" id="hintDisplay"></div>
+      <div class="hint-display show" id="hintDisplay"></div>
 
       <!-- Sentence Result -->
       <div class="sentence-result" id="sentenceResult"></div>
@@ -110,7 +110,7 @@
       <!-- Action Buttons -->
       <div class="action-row">
         <button class="btn btn-ghost" id="hintBtn" onclick="useHint()">
-          💡 Hint <span class="hint-counter" id="hintCounter">0/5</span>
+          💡 Hint <span class="hint-counter" id="hintCounter">0/3</span>
         </button>
         <button class="btn btn-ghost" onclick="clearInput()">🗑️ Xóa</button>
         <button class="btn btn-primary" id="checkBtn" onclick="checkCurrentSentence()">✅ Kiểm tra</button>
@@ -141,6 +141,7 @@ const state = {
   currentSentenceIndex: 0,
   results: [], // { sentenceId, userAnswer, isCorrect, hintsUsed }
   hintsUsedThisSentence: 0,
+  revealedWords:[],
   isPlaying: false,
   audioEl: null
 };
@@ -212,6 +213,8 @@ function loadCurrentSentence() {
 
   // Reset state
   state.hintsUsedThisSentence = 0;
+  state.revealedWords=[];
+renderHintWords();
 
   // Update UI
   document.getElementById('currentSentenceNum').textContent = state.currentSentenceIndex + 1;
@@ -237,6 +240,50 @@ function loadCurrentSentence() {
 
   // Update hint counter
   updateHintCounter();
+  function renderHintWords(){
+
+const sentence=
+state.lesson.sentences[state.currentSentenceIndex];
+
+const words=
+sentence.text.split(/\s+/);
+
+let html="";
+
+words.forEach((w,i)=>{
+
+const show=
+state.revealedWords.includes(i);
+
+html+=`
+
+<div class="hint-word">
+
+<div class="hint-text">
+
+${show?w:"_".repeat(w.length)}
+
+</div>
+
+<button
+class="hint-word-btn"
+onclick="revealWord(${i})"
+${show||state.hintsUsedThisSentence>=3?"disabled":""}
+>
+
+${show?"✓":"💡"}
+
+</button>
+
+</div>
+
+`;
+
+});
+
+document.getElementById("hintDisplay").innerHTML=html;
+
+}
 
   // Update progress
   updateProgress();
@@ -252,11 +299,15 @@ function updateProgress() {
   document.getElementById('progressFill').style.width = percent + '%';
 }
 
-function updateHintCounter() {
-  const maxHints = state.lesson.maxHints || 5;
-  document.getElementById('hintCounter').textContent = `${state.hintsUsedThisSentence}/${maxHints}`;
-}
+function updateHintCounter(){
 
+document.getElementById(
+"hintCounter"
+).textContent=
+
+state.hintsUsedThisSentence+"/3";
+
+}
 // =========================================================
 // CHECK SENTENCE
 // =========================================================
@@ -363,77 +414,39 @@ function nextSentence() {
 // =========================================================
 // HINT SYSTEM
 // =========================================================
-function useHint() {
-  const maxHints = state.lesson.maxHints || 5;
+function useHint(){
 
-  if (state.hintsUsedThisSentence >= maxHints) {
-    toast('🚫 Đã hết lượt hint cho câu này', 'warning');
-    return;
-  }
+toast(
+"💡 Hãy bấm vào từng nút Hint dưới mỗi từ",
+"info"
+);
 
-  state.hintsUsedThisSentence++;
-  updateHintCounter();
+}
+function revealWord(index){
 
-  const sentence = state.lesson.sentences[state.currentSentenceIndex];
-  const text = sentence.text;
-  const words = text.split(/\s+/);
-  const hintEl = document.getElementById('hintDisplay');
-  let hint = '';
+if(state.hintsUsedThisSentence>=3){
 
-  switch (state.hintsUsedThisSentence) {
-    case 1:
-      // Hiện số từ (độ dài mỗi từ)
-      hint = '📏 Số ký tự mỗi từ:\n' + words.map(w => '▁'.repeat(w.length)).join('  ');
-      break;
+toast("🚫 Đã dùng hết 3 hint","warning");
 
-    case 2:
-      // Hiện chữ cái đầu
-      hint = '🔤 Chữ cái đầu:\n' + words.map(w => w[0] + '_'.repeat(Math.max(0, w.length - 1))).join('  ');
-      break;
+return;
 
-    case 3:
-      // Hiện 50% ký tự
-      hint = '🔠 50% ký tự:\n' + words.map(w => {
-        const chars = w.split('');
-        return chars.map((c, i) => i % 2 === 0 ? c : '_').join('');
-      }).join('  ');
-      break;
-
-    case 4:
-      // Hiện từ vựng khó (từ field vocab)
-      if (sentence.vocab && sentence.vocab.length > 0) {
-        hint = '📖 Từ vựng quan trọng:\n' + sentence.vocab.map(v =>
-          `• ${v.word} = ${v.meaning}`
-        ).join('\n');
-      } else {
-        hint = '📖 Không có gợi ý từ vựng cho câu này';
-      }
-      break;
-
-    case 5:
-      // Hiện toàn bộ nhưng blur
-      hintEl.innerHTML = `
-        <div style="filter: blur(5px); user-select: none; transition: filter 0.3s;">${escapeHtml(text)}</div>
-        <div style="margin-top: 10px; font-size: 0.85rem; color: var(--text-muted); font-family: 'Be Vietnam Pro', sans-serif;">
-          💡 Click vào để bỏ mờ (cẩn thận nhé!)
-        </div>
-      `;
-      hintEl.classList.add('show');
-      // Click to reveal
-      hintEl.querySelector('div').addEventListener('click', function() {
-        this.style.filter = 'blur(0)';
-      });
-      return;
-
-    default:
-      hint = '🤷 Hết gợi ý rồi!';
-  }
-
-  hintEl.textContent = hint;
-  hintEl.classList.add('show');
-  toast(`💡 Đã dùng hint ${state.hintsUsedThisSentence}/${maxHints}`, 'info');
 }
 
+if(state.revealedWords.includes(index)){
+
+return;
+
+}
+
+state.revealedWords.push(index);
+
+state.hintsUsedThisSentence++;
+
+updateHintCounter();
+
+renderHintWords();
+
+}
 // =========================================================
 // FINAL RESULT
 // =========================================================
