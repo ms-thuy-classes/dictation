@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Luyện nghe - Learn with Ms.Thúy</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="container">
+    <div class="header-content">
+      <a href="index.html" class="back-btn">← Quay lại</a>
+      <div class="logo">
+        <div class="logo-icon">🎧</div>
+        <div class="logo-text">
+          Learn with Ms.Thúy
+          <small id="lessonTitle">Loading...</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- MAIN CONTENT -->
+<main class="listening-container">
+
+  <!-- Loading state -->
+  <div id="loadingState" class="loading">
+    <div class="spinner"></div>
+    <div>Đang tải bài nghe...</div>
+  </div>
+
+  <!-- Lesson content (ẩn ban đầu) -->
+  <div id="lessonContent" style="display:none;">
+
+    <!-- Lesson Header with Progress -->
+    <div class="lesson-header">
+      <div class="lesson-title">
+        <span id="lessonEmoji">🎧</span>
+        <span id="lessonTitleMain">Lesson Title</span>
+      </div>
+      <div class="lesson-progress">
+        <span id="progressText">Câu 1/5</span>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <span id="progressPercent">0%</span>
+      </div>
+    </div>
+
+    <!-- Audio Player -->
+    <div class="audio-player">
+      <div class="player-main">
+        <button class="play-btn" id="playBtn" onclick="togglePlay()">▶</button>
+        <div class="player-info">
+          <div class="waveform" id="waveform"></div>
+          <div class="time-display">
+            <span id="currentTime">0:00</span>
+            <span id="duration">0:00</span>
+          </div>
+        </div>
+      </div>
+      <div class="player-controls">
+        <div class="control-group">
+          <button class="ctrl-btn" onclick="seekAudio(-5)">⏪ -5s</button>
+          <button class="ctrl-btn" onclick="seekAudio(5)">+5s ⏩</button>
+          <button class="ctrl-btn" onclick="replayAudio()">🔁 Replay</button>
+        </div>
+        <div class="control-group">
+          <button class="ctrl-btn speed-btn" data-speed="0.5">0.5x</button>
+          <button class="ctrl-btn speed-btn" data-speed="0.75">0.75x</button>
+          <button class="ctrl-btn speed-btn active" data-speed="1">1x</button>
+          <button class="ctrl-btn speed-btn" data-speed="1.25">1.25x</button>
+          <button class="ctrl-btn speed-btn" data-speed="1.5">1.5x</button>
+        </div>
+      </div>
+      <audio id="audioEl" preload="metadata"></audio>
+    </div>
+
+    <!-- Sentence Card -->
+    <div class="sentence-card" id="sentenceCard">
+      <div class="sentence-header">
+        <div class="sentence-number">
+          <span>📝</span>
+          <span>Câu <span id="currentSentenceNum">1</span>/<span id="totalSentences">5</span></span>
+        </div>
+        <div class="sentence-translation" id="sentenceTranslation"></div>
+      </div>
+
+      <textarea
+        class="dictation-input"
+        id="dictInput"
+        placeholder="Nghe và gõ những gì bạn nghe được..."
+        oninput="autoResize(this)"></textarea>
+
+      <!-- Hint Display -->
+      <div class="hint-display" id="hintDisplay"></div>
+
+      <!-- Sentence Result -->
+      <div class="sentence-result" id="sentenceResult"></div>
+
+      <!-- Action Buttons -->
+      <div class="action-row">
+        <button class="btn btn-ghost" id="hintBtn" onclick="useHint()">
+          💡 Hint <span class="hint-counter" id="hintCounter">0/5</span>
+        </button>
+        <button class="btn btn-ghost" onclick="clearInput()">🗑️ Xóa</button>
+        <button class="btn btn-primary" id="checkBtn" onclick="checkCurrentSentence()">✅ Kiểm tra</button>
+        <button class="btn btn-success" id="nextBtn" onclick="nextSentence()" style="display:none;">
+          Câu tiếp theo →
+        </button>
+      </div>
+    </div>
+
+    <!-- Final Result (ẩn ban đầu) -->
+    <div id="finalResult" style="display:none;"></div>
+
+  </div>
+</main>
+
+<!-- Toast container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="script.js"></script>
+<script>
+/* =========================================================
+   LISTENING PAGE LOGIC
+   ========================================================= */
+
+// State
+const state = {
+  lesson: null,
+  currentSentenceIndex: 0,
+  results: [], // { sentenceId, userAnswer, isCorrect, hintsUsed }
+  hintsUsedThisSentence: 0,
+  isPlaying: false,
+  audioEl: null
+};
+
+// =========================================================
+// INIT - Load lesson data from URL params
+// =========================================================
+async function initLesson() {
+  const params = new URLSearchParams(window.location.search);
+  const lessonId = params.get('id');
+  const dataFile = params.get('data');
+
+  if (!dataFile) {
+    toast('Thiếu thông tin bài học', 'error');
+    return;
+  }
+
+  try {
+    const res = await fetch(dataFile + '?t=' + Date.now());
+    if (!res.ok) throw new Error('Không thể tải ' + dataFile);
+    const lesson = await res.json();
+
+    state.lesson = lesson;
+    state.audioEl = document.getElementById('audioEl');
+
+    // Update UI
+    document.title = `${lesson.title} - Learn with Ms.Thúy`;
+    document.getElementById('lessonTitle').textContent = lesson.title;
+    document.getElementById('lessonTitleMain').textContent = lesson.title;
+    document.getElementById('lessonEmoji').textContent = '🎧';
+    document.getElementById('totalSentences').textContent = lesson.sentences.length;
+
+    // Setup audio
+    state.audioEl.src = lesson.audio;
+
+    // Generate waveform
+    generateWaveform();
+
+    // Load first sentence
+    loadCurrentSentence();
+
+    // Show content
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('lessonContent').style.display = 'block';
+
+    // Setup audio events
+    setupAudioEvents();
+
+    // Setup speed buttons
+    setupSpeedButtons();
+
+  } catch (e) {
+    console.error(e);
+    document.getElementById('loadingState').innerHTML = `
+      <div class="empty-state-icon">⚠️</div>
+      <h3>Lỗi tải bài học</h3>
+      <p style="margin-bottom: 16px;">${escapeHtml(e.message)}</p>
+      <a href="index.html" class="btn btn-primary" style="margin-top: 16px;">← Về trang chủ</a>
+    `;
+  }
+}
+
+// =========================================================
+// SENTENCE MANAGEMENT
+// =========================================================
+function loadCurrentSentence() {
+  const sentence = state.lesson.sentences[state.currentSentenceIndex];
+  if (!sentence) return;
+
+  // Reset state
+  state.hintsUsedThisSentence = 0;
+
+  // Update UI
+  document.getElementById('currentSentenceNum').textContent = state.currentSentenceIndex + 1;
+  document.getElementById('sentenceTranslation').textContent = '💭 ' + (sentence.translation || '');
+
+  // Reset input
+  const input = document.getElementById('dictInput');
+  input.value = '';
+  input.disabled = false;
+  input.focus();
+  autoResize(input);
+
+  // Hide hint & result
+  document.getElementById('hintDisplay').classList.remove('show');
+  document.getElementById('hintDisplay').textContent = '';
+  document.getElementById('sentenceResult').classList.remove('show', 'correct', 'incorrect');
+
+  // Update buttons
+  document.getElementById('checkBtn').style.display = 'inline-flex';
+  document.getElementById('checkBtn').disabled = false;
+  document.getElementById('hintBtn').disabled = false;
+  document.getElementById('nextBtn').style.display = 'none';
+
+  // Update hint counter
+  updateHintCounter();
+
+  // Update progress
+  updateProgress();
+}
+
+function updateProgress() {
+  const total = state.lesson.sentences.length;
+  const current = state.currentSentenceIndex;
+  const percent = Math.round((current / total) * 100);
+
+  document.getElementById('progressText').textContent = `Câu ${current + 1}/${total}`;
+  document.getElementById('progressPercent').textContent = percent + '%';
+  document.getElementById('progressFill').style.width = percent + '%';
+}
+
+function updateHintCounter() {
+  const maxHints = state.lesson.maxHints || 5;
+  document.getElementById('hintCounter').textContent = `${state.hintsUsedThisSentence}/${maxHints}`;
+}
+
+// =========================================================
+// CHECK SENTENCE
+// =========================================================
+function checkCurrentSentence() {
+  const sentence = state.lesson.sentences[state.currentSentenceIndex];
+  const userText = document.getElementById('dictInput').value.trim();
+
+  if (!userText) {
+    toast('Vui lòng gõ nội dung trước khi kiểm tra', 'warning');
+    return;
+  }
+
+  // Compare
+  const { isCorrect, html } = compareSentences(userText, sentence.text);
+
+  // Save result
+  state.results.push({
+    sentenceId: sentence.id,
+    userAnswer: userText,
+    correctAnswer: sentence.text,
+    isCorrect: isCorrect,
+    hintsUsed: state.hintsUsedThisSentence
+  });
+
+  // Show result
+  const resultEl = document.getElementById('sentenceResult');
+  resultEl.className = 'sentence-result show ' + (isCorrect ? 'correct' : 'incorrect');
+  resultEl.innerHTML = html;
+
+  // Disable input & check button
+  document.getElementById('dictInput').disabled = true;
+  document.getElementById('checkBtn').disabled = true;
+  document.getElementById('hintBtn').disabled = true;
+
+  // Show next button
+  const isLastSentence = state.currentSentenceIndex >= state.lesson.sentences.length - 1;
+  const nextBtn = document.getElementById('nextBtn');
+  nextBtn.style.display = 'inline-flex';
+  nextBtn.textContent = isLastSentence ? '🏁 Xem kết quả' : 'Câu tiếp theo →';
+
+  // Toast
+  if (isCorrect) {
+    toast('✅ Chính xác! Giỏi lắm!', 'success');
+  } else {
+    toast('❌ Chưa đúng, xem đáp án bên dưới', 'error');
+  }
+}
+
+function compareSentences(userText, correctText) {
+  const userWords = userText.split(/\s+/).filter(w => w);
+  const correctWords = correctText.split(/\s+/).filter(w => w);
+
+  let html = '';
+  let correctCount = 0;
+  const maxLen = Math.max(userWords.length, correctWords.length);
+
+  for (let i = 0; i < maxLen; i++) {
+    const u = userWords[i];
+    const c = correctWords[i];
+
+    if (u === undefined) {
+      html += `<span class="word-missing">[${escapeHtml(c)}]</span> `;
+    } else if (c === undefined) {
+      html += `<span class="word-wrong">${escapeHtml(u)}</span> `;
+    } else if (normalizeWord(u) === normalizeWord(c)) {
+      html += `<span class="word-correct">${escapeHtml(u)}</span> `;
+      correctCount++;
+    } else {
+      html += `<span class="word-wrong">${escapeHtml(u)}</span> `;
+    }
+  }
+
+  const isCorrect = correctCount === correctWords.length && userWords.length === correctWords.length;
+
+  if (!isCorrect) {
+    html += `<div class="correct-answer">✅ Đáp án đúng: <strong>${escapeHtml(correctText)}</strong></div>`;
+  }
+
+  return { isCorrect, html, correctCount, totalWords: correctWords.length };
+}
+
+function normalizeWord(w) {
+  // Bỏ dấu câu, lowercase, giữ lại apostrophe
+  return w.toLowerCase().replace(/[.,!?;:"()\[\]{}]/g, '').trim();
+}
+
+// =========================================================
+// NEXT SENTENCE
+// =========================================================
+function nextSentence() {
+  state.currentSentenceIndex++;
+
+  if (state.currentSentenceIndex >= state.lesson.sentences.length) {
+    // Done - show final result
+    showFinalResult();
+  } else {
+    // Load next sentence
+    loadCurrentSentence();
+    // Scroll to top of sentence card
+    document.getElementById('sentenceCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+// =========================================================
+// HINT SYSTEM
+// =========================================================
+function useHint() {
+  const maxHints = state.lesson.maxHints || 5;
+
+  if (state.hintsUsedThisSentence >= maxHints) {
+    toast('🚫 Đã hết lượt hint cho câu này', 'warning');
+    return;
+  }
+
+  state.hintsUsedThisSentence++;
+  updateHintCounter();
+
+  const sentence = state.lesson.sentences[state.currentSentenceIndex];
+  const text = sentence.text;
+  const words = text.split(/\s+/);
+  const hintEl = document.getElementById('hintDisplay');
+  let hint = '';
+
+  switch (state.hintsUsedThisSentence) {
+    case 1:
+      // Hiện số từ (độ dài mỗi từ)
+      hint = '📏 Số ký tự mỗi từ:\n' + words.map(w => '▁'.repeat(w.length)).join('  ');
+      break;
+
+    case 2:
+      // Hiện chữ cái đầu
+      hint = '🔤 Chữ cái đầu:\n' + words.map(w => w[0] + '_'.repeat(Math.max(0, w.length - 1))).join('  ');
+      break;
+
+    case 3:
+      // Hiện 50% ký tự
+      hint = '🔠 50% ký tự:\n' + words.map(w => {
+        const chars = w.split('');
+        return chars.map((c, i) => i % 2 === 0 ? c : '_').join('');
+      }).join('  ');
+      break;
+
+    case 4:
+      // Hiện từ vựng khó (từ field vocab)
+      if (sentence.vocab && sentence.vocab.length > 0) {
+        hint = '📖 Từ vựng quan trọng:\n' + sentence.vocab.map(v =>
+          `• ${v.word} = ${v.meaning}`
+        ).join('\n');
+      } else {
+        hint = '📖 Không có gợi ý từ vựng cho câu này';
+      }
+      break;
+
+    case 5:
+      // Hiện toàn bộ nhưng blur
+      hintEl.innerHTML = `
+        <div style="filter: blur(5px); user-select: none; transition: filter 0.3s;">${escapeHtml(text)}</div>
+        <div style="margin-top: 10px; font-size: 0.85rem; color: var(--text-muted); font-family: 'Be Vietnam Pro', sans-serif;">
+          💡 Click vào để bỏ mờ (cẩn thận nhé!)
+        </div>
+      `;
+      hintEl.classList.add('show');
+      // Click to reveal
+      hintEl.querySelector('div').addEventListener('click', function() {
+        this.style.filter = 'blur(0)';
+      });
+      return;
+
+    default:
+      hint = '🤷 Hết gợi ý rồi!';
+  }
+
+  hintEl.textContent = hint;
+  hintEl.classList.add('show');
+  toast(`💡 Đã dùng hint ${state.hintsUsedThisSentence}/${maxHints}`, 'info');
+}
+
+// =========================================================
+// FINAL RESULT
+// =========================================================
+function showFinalResult() {
+  // Hide sentence card
+  document.getElementById('sentenceCard').style.display = 'none';
+
+  // Calculate stats
+  const totalSentences = state.lesson.sentences.length;
+  const correctCount = state.results.filter(r => r.isCorrect).length;
+  const incorrectCount = totalSentences - correctCount;
+  const accuracy = Math.round((correctCount / totalSentences) * 100);
+  const score = Math.round((correctCount / totalSentences) * 10 * 10) / 10; // Thang 10
+  const totalHints = state.results.reduce((sum, r) => sum + r.hintsUsed, 0);
+
+  // Build transcript HTML
+  const transcriptHtml = state.lesson.sentences.map((s, i) => {
+    const result = state.results[i];
+    const lineClass = result.isCorrect ? 'correct-line' : 'incorrect-line';
+    const icon = result.isCorrect ? '✅' : '❌';
+    return `
+      <div class="transcript-line ${lineClass}">
+        <span class="line-number">${icon} ${i + 1}</span>
+        <div>
+          <div>${escapeHtml(s.text)}</div>
+          ${!result.isCorrect ? `<div style="font-size:0.85rem; color:var(--text-muted); margin-top:4px;">
+            Bạn gõ: <em>${escapeHtml(result.userAnswer)}</em>
+          </div>` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // Score message
+  let scoreMessage = '';
+  let scoreEmoji = '';
+  if (score === 10) { scoreMessage = 'Xuất sắc! Perfect score!'; scoreEmoji = '🏆'; }
+  else if (score >= 8) { scoreMessage = 'Rất giỏi! Tiếp tục phát huy!'; scoreEmoji = '🌟'; }
+  else if (score >= 6) { scoreMessage = 'Khá tốt! Cố gắng thêm nhé!'; scoreEmoji = '💪'; }
+  else if (score >= 4) { scoreMessage = 'Cần cải thiện thêm!'; scoreEmoji = '📚'; }
+  else { scoreMessage = 'Đừng nản, hãy thử lại nhé!'; scoreEmoji = '🌱'; }
+
+  // Render final result
+  const resultContainer = document.getElementById('finalResult');
+  resultContainer.style.display = 'block';
+  resultContainer.innerHTML = `
+    <div class="result-container">
+      <div style="font-size: 4rem; margin-bottom: 16px;">${scoreEmoji}</div>
+      <h2 style="margin-bottom: 8px;">${scoreMessage}</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 24px;">Bạn đã hoàn thành bài nghe "${escapeHtml(state.lesson.title)}"</p>
+
+      <div class="result-score">
+        <div class="result-score-value" id="animatedScore">0</div>
+        <div class="result-score-label">Điểm trên 10</div>
+      </div>
+
+      <div class="result-stats">
+        <div class="result-stat">
+          <div class="result-stat-value" style="color: var(--success);">${correctCount}</div>
+          <div class="result-stat-label">Câu đúng ✅</div>
+        </div>
+        <div class="result-stat">
+          <div class="result-stat-value" style="color: var(--danger);">${incorrectCount}</div>
+          <div class="result-stat-label">Câu sai ❌</div>
+        </div>
+        <div class="result-stat">
+          <div class="result-stat-value">${totalSentences}</div>
+          <div class="result-stat-label">Tổng số câu</div>
+        </div>
+        <div class="result-stat">
+          <div class="result-stat-value">${accuracy}%</div>
+          <div class="result-stat-label">Độ chính xác</div>
+        </div>
+        <div class="result-stat">
+          <div class="result-stat-value" style="color: var(--warning);">${totalHints}</div>
+          <div class="result-stat-label">Hint đã dùng 💡</div>
+        </div>
+      </div>
+
+      <div class="full-transcript">
+        <h3>📜 Full Transcript</h3>
+        ${transcriptHtml}
+      </div>
+
+      <div class="action-row" style="justify-content: center; margin-top: 32px;">
+        <button class="btn btn-primary" onclick="retryLesson()">🔁 Làm lại</button>
+        <a href="index.html" class="btn btn-ghost">🏠 Về trang chủ</a>
+      </div>
+    </div>
+  `;
+
+  // Animate score
+  animateScore(score);
+
+  // Scroll to result
+  resultContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function animateScore(target) {
+  const el = document.getElementById('animatedScore');
+  let current = 0;
+  const duration = 1500;
+  const startTime = performance.now();
+
+  function update(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    // Ease out
+    const eased = 1 - Math.pow(1 - progress, 3);
+    current = target * eased;
+    el.textContent = current.toFixed(1);
+    if (progress < 1) requestAnimationFrame(update);
+    else el.textContent = target.toFixed(1);
+  }
+  requestAnimationFrame(update);
+}
+
+function retryLesson() {
+  state.currentSentenceIndex = 0;
+  state.results = [];
+  document.getElementById('finalResult').style.display = 'none';
+  document.getElementById('sentenceCard').style.display = 'block';
+  loadCurrentSentence();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// =========================================================
+// AUDIO PLAYER
+// =========================================================
+function setupAudioEvents() {
+  const audio = state.audioEl;
+
+  audio.addEventListener('timeupdate', function() {
+    const current = this.currentTime;
+    const duration = this.duration || 0;
+    document.getElementById('currentTime').textContent = formatTime(current);
+    document.getElementById('duration').textContent = formatTime(duration);
+
+    // Update waveform
+    const bars = document.querySelectorAll('.wave-bar');
+    const progress = duration ? current / duration : 0;
+    const activeCount = Math.floor(progress * bars.length);
+    bars.forEach((bar, i) => {
+      bar.classList.toggle('active', i < activeCount);
+    });
+  });
+
+  audio.addEventListener('ended', function() {
+    document.getElementById('playBtn').textContent = '▶';
+    state.isPlaying = false;
+  });
+
+  audio.addEventListener('error', function() {
+    toast('⚠️ Không thể tải file audio. Kiểm tra thư mục audio/', 'error');
+  });
+}
+
+function togglePlay() {
+  const audio = state.audioEl;
+  const btn = document.getElementById('playBtn');
+
+  if (audio.paused) {
+    audio.play().then(() => {
+      btn.textContent = '⏸';
+      state.isPlaying = true;
+    }).catch(e => {
+      toast('Lỗi phát audio: ' + e.message, 'error');
+    });
+  } else {
+    audio.pause();
+    btn.textContent = '▶';
+    state.isPlaying = false;
+  }
+}
+
+function seekAudio(seconds) {
+  const audio = state.audioEl;
+  if (audio.src) {
+    audio.currentTime = Math.max(0, Math.min(audio.duration || 0, audio.currentTime + seconds));
+  }
+}
+
+function replayAudio() {
+  const audio = state.audioEl;
+  if (audio.src) {
+    audio.currentTime = 0;
+    audio.play().catch(() => {});
+  }
+}
+
+function setupSpeedButtons() {
+  document.querySelectorAll('.speed-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.audioEl.playbackRate = parseFloat(btn.dataset.speed);
+    });
+  });
+}
+
+function generateWaveform() {
+  const waveform = document.getElementById('waveform');
+  waveform.innerHTML = '';
+  const bars = 60;
+  for (let i = 0; i < bars; i++) {
+    const bar = document.createElement('div');
+    bar.className = 'wave-bar';
+    bar.style.height = (20 + Math.random() * 80) + '%';
+    waveform.appendChild(bar);
+  }
+}
+
+function formatTime(s) {
+  if (!s || isNaN(s)) return '0:00';
+  const m = Math.floor(s / 60);
+  const sec = Math.floor(s % 60);
+  return `${m}:${sec.toString().padStart(2, '0')}`;
+}
+
+// =========================================================
+// UTILITIES
+// =========================================================
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = el.scrollHeight + 'px';
+}
+
+function clearInput() {
+  const input = document.getElementById('dictInput');
+  input.value = '';
+  autoResize(input);
+  input.focus();
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function toast(msg, type = 'info') {
+  const container = document.getElementById('toastContainer');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.textContent = msg;
+  container.appendChild(el);
+  setTimeout(() => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateX(100%)';
+    setTimeout(() => el.remove(), 300);
+  }, 3000);
+}
+
+// =========================================================
+// INIT
+// =========================================================
+initLesson();
+</script>
+
+</body>
+</html>
