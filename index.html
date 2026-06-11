@@ -1,0 +1,1730 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Learn with Ms. Thúy - Listening Dictation</title>
+<meta name="description" content="Luyện nghe chép chính tả tiếng Anh chuyên nghiệp" />
+
+<!-- QR Code -->
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
+<style>
+/* =========================================================
+   DESIGN SYSTEM - Variables
+   ========================================================= */
+:root {
+  --primary: #6366f1;
+  --primary-dark: #4f46e5;
+  --primary-light: #818cf8;
+  --accent: #f59e0b;
+  --success: #10b981;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+
+  --bg: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-elevated: #ffffff;
+  --text: #0f172a;
+  --text-muted: #64748b;
+  --border: #e2e8f0;
+
+  --radius: 16px;
+  --radius-sm: 10px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+  --shadow: 0 4px 16px rgba(0,0,0,.08);
+  --shadow-lg: 0 20px 40px rgba(0,0,0,.12);
+
+  --transition: .25s cubic-bezier(.4,0,.2,1);
+}
+
+[data-theme="dark"] {
+  --bg: #0b1020;
+  --bg-card: #121831;
+  --bg-elevated: #1a2142;
+  --text: #f1f5f9;
+  --text-muted: #94a3b8;
+  --border: #1e293b;
+  --shadow: 0 4px 16px rgba(0,0,0,.4);
+  --shadow-lg: 0 20px 40px rgba(0,0,0,.5);
+}
+
+/* =========================================================
+   RESET & BASE
+   ========================================================= */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  transition: background var(--transition), color var(--transition);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+input, textarea { font-family: inherit; }
+a { color: inherit; text-decoration: none; }
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* =========================================================
+   LAYOUT
+   ========================================================= */
+.app { display: flex; min-height: 100vh; }
+
+.sidebar {
+  width: 260px;
+  background: var(--bg-card);
+  border-right: 1px solid var(--border);
+  padding: 24px 16px;
+  position: fixed;
+  height: 100vh;
+  overflow-y: auto;
+  transition: transform var(--transition);
+  z-index: 100;
+}
+.sidebar-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 0 8px 24px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+.logo-icon {
+  width: 44px; height: 44px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  box-shadow: 0 4px 12px rgba(99,102,241,.4);
+}
+.logo-text { font-size: 15px; font-weight: 700; line-height: 1.2; }
+.logo-text small { display: block; font-size: 11px; color: var(--text-muted); font-weight: 500; }
+
+.nav-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-weight: 500;
+  font-size: 14px;
+  transition: all var(--transition);
+  margin-bottom: 4px;
+  width: 100%;
+  text-align: left;
+}
+.nav-item:hover { background: var(--bg); color: var(--text); transform: translateX(2px); }
+.nav-item.active {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: white;
+  box-shadow: 0 4px 12px rgba(99,102,241,.3);
+}
+.nav-icon { font-size: 18px; }
+
+.main {
+  flex: 1;
+  margin-left: 260px;
+  padding: 24px 32px;
+  transition: margin var(--transition);
+}
+
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 28px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.topbar-title h1 { font-size: 24px; font-weight: 700; }
+.topbar-title p { color: var(--text-muted); font-size: 13px; margin-top: 2px; }
+
+.topbar-actions { display: flex; align-items: center; gap: 12px; }
+.icon-btn {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  transition: all var(--transition);
+}
+.icon-btn:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+
+/* =========================================================
+   COMPONENTS
+   ========================================================= */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition);
+}
+.card:hover { box-shadow: var(--shadow); }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 12px 20px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 14px;
+  transition: all var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: white;
+  box-shadow: 0 4px 12px rgba(99,102,241,.3);
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(99,102,241,.4); }
+.btn-ghost { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
+.btn-ghost:hover { background: var(--border); }
+.btn-success { background: var(--success); color: white; }
+.btn-success:hover { transform: translateY(-2px); }
+.btn:disabled { opacity: .5; cursor: not-allowed; transform: none !important; }
+
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,.5);
+  transform: scale(0);
+  animation: ripple .6s linear;
+  pointer-events: none;
+}
+@keyframes ripple { to { transform: scale(4); opacity: 0; } }
+
+.form-group { margin-bottom: 18px; }
+.form-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+.form-input, .form-textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  transition: all var(--transition);
+}
+.form-input:focus, .form-textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(99,102,241,.15);
+}
+.form-textarea { min-height: 120px; resize: vertical; font-family: 'JetBrains Mono', monospace; }
+
+/* =========================================================
+   PAGES
+   ========================================================= */
+.page { display: none; animation: fadeIn .4s ease; }
+.page.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* HOME */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  border-radius: 24px;
+  padding: 48px 40px;
+  color: white;
+  margin-bottom: 32px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: ''; position: absolute;
+  width: 300px; height: 300px;
+  background: rgba(255,255,255,.1);
+  border-radius: 50%;
+  top: -100px; right: -100px;
+}
+.hero::after {
+  content: ''; position: absolute;
+  width: 200px; height: 200px;
+  background: rgba(255,255,255,.08);
+  border-radius: 50%;
+  bottom: -80px; left: 20%;
+}
+.hero h1 { font-size: 36px; margin-bottom: 12px; position: relative; z-index: 1; }
+.hero p { font-size: 16px; opacity: .95; margin-bottom: 24px; max-width: 600px; position: relative; z-index: 1; }
+.hero-actions { display: flex; gap: 12px; flex-wrap: wrap; position: relative; z-index: 1; }
+.hero .btn-primary { background: white; color: var(--primary); }
+.hero .btn-ghost { background: rgba(255,255,255,.15); color: white; border-color: rgba(255,255,255,.3); }
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  transition: all var(--transition);
+}
+.stat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
+.stat-icon { font-size: 28px; margin-bottom: 8px; }
+.stat-value { font-size: 28px; font-weight: 700; }
+.stat-label { color: var(--text-muted); font-size: 13px; margin-top: 4px; }
+
+/* COURSES */
+.courses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+.course-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: all var(--transition);
+  cursor: pointer;
+}
+.course-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
+.course-cover {
+  height: 140px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 48px;
+  color: white;
+}
+.course-body { padding: 18px; }
+.course-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+.course-meta { color: var(--text-muted); font-size: 12px; display: flex; gap: 12px; margin-top: 10px; }
+
+/* DICTATION */
+.dictation-layout {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 20px;
+}
+@media (max-width: 1024px) { .dictation-layout { grid-template-columns: 1fr; } }
+
+.progress-wrap {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  margin-bottom: 20px;
+}
+.progress-bar {
+  height: 8px;
+  background: var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--primary-light));
+  border-radius: 4px;
+  transition: width .5s ease;
+  width: 0%;
+}
+
+/* Audio Player */
+.audio-player {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-sm);
+}
+.player-visual {
+  display: flex; align-items: center; gap: 16px;
+  margin-bottom: 16px;
+}
+.play-btn {
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: white;
+  font-size: 24px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 8px 20px rgba(99,102,241,.4);
+  transition: all var(--transition);
+  flex-shrink: 0;
+}
+.play-btn:hover { transform: scale(1.08); }
+.play-btn:active { transform: scale(.95); }
+
+.waveform {
+  flex: 1;
+  height: 60px;
+  display: flex; align-items: center; gap: 3px;
+}
+.wave-bar {
+  flex: 1;
+  background: var(--border);
+  border-radius: 2px;
+  transition: background .2s;
+  min-height: 4px;
+}
+.wave-bar.active { background: var(--primary); }
+
+.time-display {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 8px;
+  text-align: center;
+}
+
+.player-controls {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+.seek-btn, .speed-btn {
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  font-size: 13px;
+  font-weight: 600;
+  transition: all var(--transition);
+}
+.seek-btn:hover, .speed-btn:hover { background: var(--primary); color: white; border-color: var(--primary); }
+.speed-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+.input-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.dictation-input {
+  width: 100%;
+  min-height: 140px;
+  padding: 16px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 16px;
+  line-height: 1.7;
+  resize: vertical;
+  transition: all var(--transition);
+  font-family: 'JetBrains Mono', monospace;
+}
+.dictation-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(99,102,241,.15);
+}
+
+.action-row {
+  display: flex; gap: 12px; flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+.stats-side {
+  display: flex; flex-direction: column; gap: 12px;
+}
+.mini-stat {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.mini-stat-label { font-size: 13px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+.mini-stat-value { font-size: 18px; font-weight: 700; }
+
+.hint-display {
+  background: linear-gradient(135deg, rgba(245,158,11,.1), rgba(245,158,11,.05));
+  border: 1px solid rgba(245,158,11,.3);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  margin-top: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  line-height: 1.8;
+  white-space: pre-wrap;
+  display: none;
+}
+.hint-display.show { display: block; animation: fadeIn .3s; }
+
+.result-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-top: 20px;
+  display: none;
+}
+.result-card.show { display: block; animation: fadeIn .5s; }
+
+.result-text {
+  font-size: 16px;
+  line-height: 2;
+  margin: 16px 0;
+  font-family: 'JetBrains Mono', monospace;
+}
+.word-correct { color: var(--success); font-weight: 600; }
+.word-wrong {
+  color: var(--danger);
+  text-decoration: line-through;
+  font-weight: 600;
+  position: relative;
+}
+.word-wrong::after {
+  content: '→ ' attr(data-correct);
+  color: var(--success);
+  text-decoration: none;
+  margin-left: 4px;
+  font-weight: 600;
+}
+
+.score-display {
+  text-align: center;
+  padding: 30px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  border-radius: var(--radius);
+  color: white;
+  margin-top: 20px;
+}
+.score-value { font-size: 64px; font-weight: 800; line-height: 1; }
+.score-label { font-size: 14px; opacity: .9; margin-top: 8px; }
+
+.modal {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.6);
+  backdrop-filter: blur(8px);
+  display: none;
+  align-items: center; justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+.modal.show { display: flex; animation: fadeIn .3s; }
+.modal-content {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: 32px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideUp .4s cubic-bezier(.4,0,.2,1);
+}
+@keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.modal-title { font-size: 20px; font-weight: 700; margin-bottom: 16px; }
+
+.toast-container {
+  position: fixed;
+  top: 20px; right: 20px;
+  z-index: 2000;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.toast {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--primary);
+  border-radius: var(--radius-sm);
+  padding: 14px 18px;
+  box-shadow: var(--shadow-lg);
+  min-width: 280px;
+  animation: slideIn .3s;
+}
+.toast.success { border-left-color: var(--success); }
+.toast.error { border-left-color: var(--danger); }
+@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+.spinner {
+  width: 20px; height: 20px;
+  border: 2px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.menu-toggle { display: none; }
+@media (max-width: 768px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+  .main { margin-left: 0; padding: 16px; }
+  .menu-toggle { display: flex; }
+  .hero { padding: 32px 24px; }
+  .hero h1 { font-size: 26px; }
+  .dictation-layout { grid-template-columns: 1fr; }
+}
+
+.empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-muted);
+}
+.empty-icon { font-size: 64px; margin-bottom: 16px; opacity: .5; }
+
+/* Teacher Studio specific */
+.code-preview {
+  background: #0f172a;
+  color: #e2e8f0;
+  padding: 16px;
+  border-radius: var(--radius-sm);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  max-height: 300px;
+  overflow: auto;
+  white-space: pre;
+  margin-top: 12px;
+  border: 1px solid var(--border);
+}
+.instruction-box {
+  background: linear-gradient(135deg, rgba(99,102,241,.08), rgba(99,102,241,.03));
+  border: 1px solid rgba(99,102,241,.2);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  margin-bottom: 20px;
+  font-size: 13px;
+  line-height: 1.7;
+}
+.instruction-box ol { padding-left: 20px; margin-top: 8px; }
+.instruction-box code {
+  background: rgba(0,0,0,.08);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+}
+[data-theme="dark"] .instruction-box code { background: rgba(255,255,255,.1); }
+
+.file-step {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  margin-bottom: 8px;
+  align-items: flex-start;
+}
+.file-step-num {
+  width: 28px; height: 28px;
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+.file-step-content { flex: 1; font-size: 13px; }
+.file-step-content strong { display: block; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-icon">🎧</div>
+      <div class="logo-text">
+        Learn with Ms. Thúy
+        <small>Listening Dictation</small>
+      </div>
+    </div>
+
+    <button class="nav-item active" data-page="home">
+      <span class="nav-icon">🏠</span> Home
+    </button>
+    <button class="nav-item" data-page="courses">
+      <span class="nav-icon">📚</span> Courses
+    </button>
+    <button class="nav-item" data-page="teacher">
+      <span class="nav-icon">👩‍🏫</span> Teacher Studio
+    </button>
+    <button class="nav-item" data-page="history">
+      <span class="nav-icon">📊</span> History
+    </button>
+    <button class="nav-item" data-page="settings">
+      <span class="nav-icon">⚙️</span> Settings
+    </button>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main class="main">
+    <div class="topbar">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button class="icon-btn menu-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+        <div class="topbar-title">
+          <h1 id="pageTitle">Welcome back! 👋</h1>
+          <p id="pageSubtitle">Let's practice listening today</p>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn" id="themeToggle" title="Toggle theme">🌙</button>
+      </div>
+    </div>
+
+    <!-- ============ HOME PAGE ============ -->
+    <div class="page active" id="page-home">
+      <div class="hero">
+        <h1>🎧 Master English Listening</h1>
+        <p>Luyện nghe chép chính tả theo phương pháp hiệu quả nhất. Nghe, chép, kiểm tra và cải thiện mỗi ngày cùng Ms. Thúy.</p>
+        <div class="hero-actions">
+          <button class="btn btn-primary" onclick="navigate('courses')">🚀 Start Learning</button>
+          <button class="btn btn-ghost" onclick="navigate('teacher')">👩‍🏫 Teacher Studio</button>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">🔥</div>
+          <div class="stat-value" id="stat-streak">0</div>
+          <div class="stat-label">Day Streak</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">⭐</div>
+          <div class="stat-value" id="stat-xp">0</div>
+          <div class="stat-label">Total XP</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📝</div>
+          <div class="stat-value" id="stat-lessons">0</div>
+          <div class="stat-label">Lessons Done</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🎯</div>
+          <div class="stat-value" id="stat-accuracy">0%</div>
+          <div class="stat-label">Avg Accuracy</div>
+        </div>
+      </div>
+
+      <h2 style="margin-bottom:16px;font-size:20px;">🔥 Continue Learning</h2>
+      <div id="recentLessons" class="courses-grid"></div>
+    </div>
+
+    <!-- ============ COURSES PAGE ============ -->
+    <div class="page" id="page-courses">
+      <div id="coursesList" class="courses-grid">
+        <div class="empty">
+          <div class="spinner" style="margin:0 auto 16px;width:40px;height:40px;"></div>
+          Loading courses...
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ TEACHER STUDIO ============ -->
+    <div class="page" id="page-teacher">
+      <div class="instruction-box">
+        <strong>📖 Hướng dẫn tạo bài học:</strong>
+        <ol>
+          <li>Điền thông tin bài học và transcript bên dưới</li>
+          <li>Website sẽ tạo ra file JSON → <strong>Download về</strong> và đặt vào thư mục <code>transcript/</code></li>
+          <li>Đặt file MP3 vào thư mục <code>audio/</code> với tên trùng với <code>audioFile</code> trong JSON</li>
+          <li>Cập nhật file <code>transcript/index.json</code> để thêm bài mới vào danh sách</li>
+        </ol>
+      </div>
+
+      <div class="card" style="max-width:720px;">
+        <h2 style="margin-bottom:8px;">🎧 Create New Lesson</h2>
+        <p style="color:var(--text-muted);font-size:14px;margin-bottom:24px;">Tạo bài luyện nghe mới và tải file JSON về</p>
+
+        <div class="form-group">
+          <label class="form-label">Lesson Name</label>
+          <input type="text" class="form-input" id="lessonName" placeholder="VD: TOEIC Listening 01 - Meeting Schedule" oninput="updateLessonId()" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Lesson ID (slug)</label>
+          <input type="text" class="form-input" id="lessonId" placeholder="toeic-listening-01" />
+          <small style="color:var(--text-muted);font-size:12px;">Dùng cho URL và tên file. Chỉ chứa a-z, 0-9, dấu gạch ngang.</small>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Audio File Name</label>
+          <input type="text" class="form-input" id="lessonAudioFile" placeholder="toeic-listening-01.mp3" />
+          <small style="color:var(--text-muted);font-size:12px;">Tên file MP3 bạn sẽ đặt vào thư mục <code>audio/</code></small>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Transcript</label>
+          <textarea class="form-textarea" id="lessonTranscript" placeholder="Dán nội dung transcript vào đây...&#10;&#10;Good morning everyone.&#10;The meeting will start at nine tomorrow."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Cover Emoji</label>
+          <input type="text" class="form-input" id="lessonEmoji" placeholder="🎧" maxlength="4" value="🎧" />
+        </div>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn btn-primary" onclick="generateLessonFiles()">
+            ✨ Generate Files
+          </button>
+          <button class="btn btn-ghost" onclick="loadSampleData()">
+            📝 Load Sample
+          </button>
+        </div>
+      </div>
+
+      <!-- Generated files preview -->
+      <div id="generatedFiles" style="display:none;margin-top:24px;">
+        <div class="card" style="margin-bottom:16px;">
+          <h3 style="margin-bottom:12px;">📄 Generated Files</h3>
+
+          <div class="file-step">
+            <div class="file-step-num">1</div>
+            <div class="file-step-content">
+              <strong>Lesson JSON</strong>
+              <span>Save as: <code id="lessonFileName">lesson.json</code></span>
+              <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="btn btn-primary" onclick="downloadLessonJson()">💾 Download Lesson JSON</button>
+                <button class="btn btn-ghost" onclick="copyLessonJson()">📋 Copy</button>
+              </div>
+              <div class="code-preview" id="lessonJsonPreview"></div>
+            </div>
+          </div>
+
+          <div class="file-step">
+            <div class="file-step-num">2</div>
+            <div class="file-step-content">
+              <strong>Index JSON (updated)</strong>
+              <span>Replace content of: <code>transcript/index.json</code></span>
+              <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="btn btn-primary" onclick="downloadIndexJson()">💾 Download index.json</button>
+                <button class="btn btn-ghost" onclick="copyIndexJson()">📋 Copy</button>
+              </div>
+              <div class="code-preview" id="indexJsonPreview"></div>
+            </div>
+          </div>
+
+          <div class="file-step">
+            <div class="file-step-num">3</div>
+            <div class="file-step-content">
+              <strong>Audio File</strong>
+              <span>Place your MP3 file at: <code id="audioFilePath">audio/lesson.mp3</code></span>
+            </div>
+          </div>
+
+          <div style="margin-top:20px;padding:16px;background:linear-gradient(135deg,rgba(16,185,129,.1),rgba(16,185,129,.05));border:1px solid rgba(16,185,129,.3);border-radius:var(--radius-sm);">
+            <strong style="color:var(--success);">✅ Share link with students:</strong>
+            <div style="margin-top:8px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+              <code id="shareLinkDisplay" style="flex:1;background:var(--bg);padding:8px 12px;border-radius:6px;font-size:13px;word-break:break-all;"></code>
+              <button class="btn btn-ghost" onclick="copyShareLink()">🔗 Copy</button>
+            </div>
+            <div id="qrCode" style="display:flex;justify-content:center;margin-top:16px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ DICTATION PAGE ============ -->
+    <div class="page" id="page-dictation">
+      <div class="progress-wrap">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div style="font-size:13px;color:var(--text-muted);">Learn with Ms. Thúy</div>
+            <div style="font-weight:700;font-size:16px;" id="dictLessonTitle">Loading...</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:13px;color:var(--text-muted);">Progress</div>
+            <div style="font-weight:700;" id="dictProgress">0%</div>
+          </div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="dictProgressBar"></div></div>
+      </div>
+
+      <div class="dictation-layout">
+        <div>
+          <div class="audio-player">
+            <div class="player-visual">
+              <button class="play-btn" id="playBtn" onclick="togglePlay()">▶</button>
+              <div class="waveform" id="waveform"></div>
+            </div>
+            <div class="time-display">
+              <span id="currentTime">0:00</span> / <span id="duration">0:00</span>
+            </div>
+            <div class="player-controls">
+              <div style="display:flex;gap:8px;">
+                <button class="seek-btn" onclick="seekAudio(-5)">⏪ -5s</button>
+                <button class="seek-btn" onclick="seekAudio(5)">+5s ⏩</button>
+                <button class="seek-btn" onclick="replayAudio()">🔁 Replay</button>
+              </div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                <button class="speed-btn" data-speed="0.5">0.5x</button>
+                <button class="speed-btn" data-speed="0.75">0.75x</button>
+                <button class="speed-btn active" data-speed="1">1x</button>
+                <button class="speed-btn" data-speed="1.25">1.25x</button>
+                <button class="speed-btn" data-speed="1.5">1.5x</button>
+              </div>
+            </div>
+            <audio id="audioEl" preload="metadata"></audio>
+          </div>
+
+          <div class="input-card">
+            <textarea class="dictation-input" id="dictInput" placeholder="Type what you hear..."></textarea>
+            <div class="hint-display" id="hintDisplay"></div>
+            <div class="action-row">
+              <button class="btn btn-ghost" onclick="useHint()">💡 Hint</button>
+              <button class="btn btn-ghost" onclick="clearInput()">🗑️ Clear</button>
+              <button class="btn btn-success" onclick="checkAnswer()" id="checkBtn">✅ Check</button>
+            </div>
+          </div>
+
+          <div class="result-card" id="resultCard">
+            <h3 style="margin-bottom:12px;">📊 Result</h3>
+            <div class="result-text" id="resultText"></div>
+            <div class="score-display">
+              <div class="score-label">Final Score</div>
+              <div class="score-value" id="finalScore">0</div>
+            </div>
+            <div class="action-row" style="margin-top:20px;">
+              <button class="btn btn-primary" onclick="retryLesson()">🔁 Try Again</button>
+              <button class="btn btn-ghost" onclick="navigate('courses')">📚 Other Lessons</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="stats-side">
+          <div class="mini-stat">
+            <div class="mini-stat-label">💡 Hints</div>
+            <div class="mini-stat-value"><span id="hintCount">0</span>/6</div>
+          </div>
+          <div class="mini-stat">
+            <div class="mini-stat-label">🔁 Replays</div>
+            <div class="mini-stat-value" id="replayCount">0</div>
+          </div>
+          <div class="mini-stat">
+            <div class="mini-stat-label">⏱️ Time</div>
+            <div class="mini-stat-value" id="timerDisplay">00:00</div>
+          </div>
+          <div class="mini-stat">
+            <div class="mini-stat-label">🎯 Accuracy</div>
+            <div class="mini-stat-value" id="liveAccuracy">--%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ HISTORY PAGE ============ -->
+    <div class="page" id="page-history">
+      <div class="card">
+        <h2 style="margin-bottom:16px;">📊 Learning History</h2>
+        <div id="historyList"></div>
+      </div>
+    </div>
+
+    <!-- ============ SETTINGS PAGE ============ -->
+    <div class="page" id="page-settings">
+      <div class="card" style="max-width:600px;">
+        <h2 style="margin-bottom:16px;">⚙️ Settings</h2>
+        <div class="form-group">
+          <label class="form-label">Theme</label>
+          <div style="display:flex;gap:10px;">
+            <button class="btn btn-ghost" onclick="setTheme('light')">☀️ Light</button>
+            <button class="btn btn-ghost" onclick="setTheme('dark')">🌙 Dark</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Reset Data</label>
+          <button class="btn btn-ghost" style="border-color:var(--danger);color:var(--danger);" onclick="resetAllData()">🗑️ Reset All Progress</button>
+        </div>
+        <div class="form-group">
+          <label class="form-label">About</label>
+          <p style="color:var(--text-muted);font-size:13px;">
+            Learn with Ms. Thúy - Listening Dictation<br>
+            Static files version (no backend required)<br>
+            Deploy on GitHub Pages, Netlify, or any static host.
+          </p>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Toast container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+/* =========================================================
+   CONFIG
+   ========================================================= */
+const CONFIG = {
+  INDEX_PATH: 'transcript/index.json',
+  LESSON_PATH: 'transcript/{id}.json',
+  AUDIO_PATH: 'audio/{file}'
+};
+
+/* =========================================================
+   STATE
+   ========================================================= */
+const state = {
+  currentPage: 'home',
+  currentLesson: null,
+  isPlaying: false,
+  hintLevel: 0,
+  replayCount: 0,
+  timerSeconds: 0,
+  timerInterval: null,
+  startTime: null,
+  userStats: JSON.parse(localStorage.getItem('userStats') || '{"xp":0,"streak":0,"lessons":0,"accuracy":[],"history":[]}'),
+  lastActiveDate: localStorage.getItem('lastActiveDate') || null,
+  generatedLesson: null,
+  existingIndex: []
+};
+
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
+document.querySelectorAll('.nav-item').forEach(btn => {
+  btn.addEventListener('click', () => {
+    navigate(btn.dataset.page);
+  });
+});
+
+function navigate(page, lessonId = null) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+  const pageEl = document.getElementById('page-' + page);
+  if (pageEl) {
+    pageEl.classList.add('active');
+    state.currentPage = page;
+  }
+
+  const navBtn = document.querySelector(`.nav-item[data-page="${page}"]`);
+  if (navBtn) navBtn.classList.add('active');
+
+  const titles = {
+    home: ['Welcome back! 👋', 'Let\'s practice listening today'],
+    courses: ['Courses 📚', 'Choose a lesson to practice'],
+    teacher: ['Teacher Studio 👩‍🏫', 'Create new lessons for your students'],
+    history: ['History 📊', 'Your learning progress'],
+    settings: ['Settings ⚙️', 'Customize your experience'],
+    dictation: ['Dictation Practice', 'Listen carefully and type what you hear']
+  };
+  document.getElementById('pageTitle').textContent = titles[page]?.[0] || '';
+  document.getElementById('pageSubtitle').textContent = titles[page]?.[1] || '';
+
+  if (page === 'courses') loadCourses();
+  if (page === 'dictation' && lessonId) loadDictation(lessonId);
+  if (page === 'history') renderHistory();
+  if (page === 'home') renderHome();
+
+  document.getElementById('sidebar').classList.remove('open');
+
+  if (lessonId) window.location.hash = `dictation/${lessonId}`;
+  else if (page !== 'home') window.location.hash = page;
+  else window.location.hash = '';
+}
+
+/* =========================================================
+   ROUTING
+   ========================================================= */
+function handleRoute() {
+  const hash = window.location.hash.slice(1);
+  if (hash.startsWith('dictation/')) {
+    const lessonId = hash.replace('dictation/', '');
+    navigate('dictation', lessonId);
+  } else if (['courses', 'teacher', 'history', 'settings'].includes(hash)) {
+    navigate(hash);
+  } else {
+    navigate('home');
+  }
+}
+window.addEventListener('hashchange', handleRoute);
+
+/* =========================================================
+   THEME
+   ========================================================= */
+function setTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('theme', theme);
+  document.getElementById('themeToggle').textContent = theme === 'dark' ? '☀️' : '🌙';
+}
+document.getElementById('themeToggle').addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme') || 'light';
+  setTheme(current === 'dark' ? 'light' : 'dark');
+});
+setTheme(localStorage.getItem('theme') || 'light');
+
+/* =========================================================
+   TOAST
+   ========================================================= */
+function toast(message, type = 'info') {
+  const container = document.getElementById('toastContainer');
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  el.textContent = message;
+  container.appendChild(el);
+  setTimeout(() => { el.style.opacity = '0'; setTimeout(() => el.remove(), 300); }, 3000);
+}
+
+/* =========================================================
+   RIPPLE EFFECT
+   ========================================================= */
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('.btn, .play-btn, .nav-item');
+  if (!btn) return;
+  const ripple = document.createElement('span');
+  ripple.className = 'ripple';
+  const rect = btn.getBoundingClientRect();
+  const size = Math.max(rect.width, rect.height);
+  ripple.style.width = ripple.style.height = size + 'px';
+  ripple.style.left = (e.clientX - rect.left - size/2) + 'px';
+  ripple.style.top = (e.clientY - rect.top - size/2) + 'px';
+  btn.appendChild(ripple);
+  setTimeout(() => ripple.remove(), 600);
+});
+
+/* =========================================================
+   LOAD COURSES FROM transcript/index.json
+   ========================================================= */
+async function loadCourses() {
+  const container = document.getElementById('coursesList');
+  container.innerHTML = `<div class="empty" style="grid-column:1/-1;"><div class="spinner" style="margin:0 auto 16px;width:40px;height:40px;"></div>Loading courses...</div>`;
+
+  try {
+    const res = await fetch(CONFIG.INDEX_PATH + '?t=' + Date.now());
+    if (!res.ok) throw new Error('Cannot load index.json');
+    const lessons = await res.json();
+
+    if (!Array.isArray(lessons) || lessons.length === 0) {
+      container.innerHTML = `
+        <div class="empty" style="grid-column:1/-1;">
+          <div class="empty-icon">📭</div>
+          <h3>No lessons yet</h3>
+          <p style="margin-bottom:16px;">Create your first lesson in Teacher Studio</p>
+          <button class="btn btn-primary" onclick="navigate('teacher')">👩‍🏫 Go to Teacher Studio</button>
+        </div>`;
+      return;
+    }
+
+    container.innerHTML = lessons.map(l => `
+      <div class="course-card" onclick="navigate('dictation', '${l.id}')">
+        <div class="course-cover">${l.emoji || '🎧'}</div>
+        <div class="course-body">
+          <div class="course-title">${escapeHtml(l.name)}</div>
+          <div class="course-meta">
+            <span>📝 Dictation</span>
+            <span>🕐 ${timeAgo(l.createdAt)}</span>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  } catch (e) {
+    console.warn('Load courses error:', e);
+    container.innerHTML = `
+      <div class="empty" style="grid-column:1/-1;">
+        <div class="empty-icon">⚠️</div>
+        <h3>Cannot load courses</h3>
+        <p style="margin-bottom:8px;">${escapeHtml(e.message)}</p>
+        <p style="font-size:13px;">Make sure <code>transcript/index.json</code> exists.</p>
+        <button class="btn btn-primary" style="margin-top:16px;" onclick="navigate('teacher')">👩‍🏫 Create a lesson</button>
+      </div>`;
+  }
+}
+
+/* =========================================================
+   LOAD DICTATION FROM transcript/{id}.json
+   ========================================================= */
+async function loadDictation(lessonId) {
+  // Reset state
+  state.hintLevel = 0;
+  state.replayCount = 0;
+  state.timerSeconds = 0;
+  state.startTime = Date.now();
+  document.getElementById('hintCount').textContent = '0';
+  document.getElementById('replayCount').textContent = '0';
+  document.getElementById('timerDisplay').textContent = '00:00';
+  document.getElementById('liveAccuracy').textContent = '--%';
+  document.getElementById('hintDisplay').classList.remove('show');
+  document.getElementById('resultCard').classList.remove('show');
+  document.getElementById('checkBtn').disabled = false;
+  document.getElementById('dictInput').value = '';
+
+  const lessonPath = CONFIG.LESSON_PATH.replace('{id}', lessonId);
+
+  try {
+    const res = await fetch(lessonPath + '?t=' + Date.now());
+    if (!res.ok) throw new Error(`Lesson not found: ${lessonId}`);
+    const lesson = await res.json();
+
+    state.currentLesson = lesson;
+    document.getElementById('dictLessonTitle').textContent = lesson.name;
+
+    // Setup audio
+    const audioUrl = CONFIG.AUDIO_PATH.replace('{file}', lesson.audioFile);
+    const audioEl = document.getElementById('audioEl');
+    audioEl.src = audioUrl;
+
+    generateWaveform();
+    startTimer();
+    updateProgress(0);
+
+    // Load saved input
+    const savedInput = localStorage.getItem('dict_input_' + lessonId);
+    if (savedInput) {
+      document.getElementById('dictInput').value = savedInput;
+      autoResizeInput();
+    }
+  } catch (e) {
+    console.error(e);
+    toast('Cannot load lesson: ' + e.message, 'error');
+    navigate('courses');
+  }
+}
+
+function generateWaveform() {
+  const waveform = document.getElementById('waveform');
+  waveform.innerHTML = '';
+  const bars = 50;
+  for (let i = 0; i < bars; i++) {
+    const bar = document.createElement('div');
+    bar.className = 'wave-bar';
+    bar.style.height = (20 + Math.random() * 80) + '%';
+    waveform.appendChild(bar);
+  }
+}
+
+/* =========================================================
+   AUDIO PLAYER
+   ========================================================= */
+function togglePlay() {
+  const audio = document.getElementById('audioEl');
+  const btn = document.getElementById('playBtn');
+
+  if (!audio.src) {
+    toast('Audio not available', 'error');
+    return;
+  }
+
+  if (audio.paused) {
+    audio.play().then(() => {
+      btn.textContent = '⏸';
+      state.isPlaying = true;
+    }).catch(e => toast('Cannot play audio: ' + e.message, 'error'));
+  } else {
+    audio.pause();
+    btn.textContent = '▶';
+    state.isPlaying = false;
+  }
+}
+
+function seekAudio(seconds) {
+  const audio = document.getElementById('audioEl');
+  if (audio.src) {
+    audio.currentTime = Math.max(0, Math.min(audio.duration || 0, audio.currentTime + seconds));
+  }
+}
+
+function replayAudio() {
+  const audio = document.getElementById('audioEl');
+  if (audio.src) {
+    audio.currentTime = 0;
+    audio.play().catch(() => {});
+  }
+  state.replayCount++;
+  document.getElementById('replayCount').textContent = state.replayCount;
+}
+
+document.querySelectorAll('.speed-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const speed = parseFloat(btn.dataset.speed);
+    document.getElementById('audioEl').playbackRate = speed;
+  });
+});
+
+document.getElementById('audioEl').addEventListener('timeupdate', function() {
+  const current = this.currentTime;
+  const duration = this.duration || 0;
+  document.getElementById('currentTime').textContent = formatTime(current);
+  document.getElementById('duration').textContent = formatTime(duration);
+
+  const bars = document.querySelectorAll('.wave-bar');
+  const progress = duration ? current / duration : 0;
+  const activeCount = Math.floor(progress * bars.length);
+  bars.forEach((bar, i) => {
+    bar.classList.toggle('active', i < activeCount);
+  });
+
+  updateProgress(progress * 100);
+});
+
+document.getElementById('audioEl').addEventListener('ended', function() {
+  document.getElementById('playBtn').textContent = '▶';
+  state.isPlaying = false;
+});
+
+document.getElementById('audioEl').addEventListener('error', function() {
+  toast('Cannot load audio file. Check audio/ folder.', 'error');
+});
+
+function formatTime(s) {
+  if (!s || isNaN(s)) return '0:00';
+  const m = Math.floor(s / 60);
+  const sec = Math.floor(s % 60);
+  return `${m}:${sec.toString().padStart(2, '0')}`;
+}
+
+function updateProgress(percent) {
+  document.getElementById('dictProgressBar').style.width = percent + '%';
+  document.getElementById('dictProgress').textContent = Math.round(percent) + '%';
+}
+
+/* =========================================================
+   TIMER
+   ========================================================= */
+function startTimer() {
+  if (state.timerInterval) clearInterval(state.timerInterval);
+  state.timerSeconds = 0;
+  state.timerInterval = setInterval(() => {
+    state.timerSeconds++;
+    document.getElementById('timerDisplay').textContent = formatTime(state.timerSeconds);
+  }, 1000);
+}
+
+/* =========================================================
+   HINT SYSTEM
+   ========================================================= */
+function useHint() {
+  if (!state.currentLesson) return;
+  if (state.hintLevel >= 6) {
+    toast('Maximum hints reached', 'error');
+    return;
+  }
+
+  state.hintLevel++;
+  document.getElementById('hintCount').textContent = state.hintLevel;
+
+  const transcript = state.currentLesson.transcript;
+  const words = transcript.split(/\s+/);
+  const hintEl = document.getElementById('hintDisplay');
+  let hint = '';
+
+  switch (state.hintLevel) {
+    case 1:
+      hint = words.map(w => '_'.repeat(w.length)).join(' ');
+      break;
+    case 2:
+      hint = words.map(w => w[0] + '_'.repeat(Math.max(0, w.length - 1))).join(' ');
+      break;
+    case 3:
+      hint = words.map(w => {
+        const chars = w.split('');
+        const showCount = Math.ceil(chars.length * 0.3);
+        const indices = [];
+        while (indices.length < showCount) {
+          const idx = Math.floor(Math.random() * chars.length);
+          if (!indices.includes(idx)) indices.push(idx);
+        }
+        return chars.map((c, i) => indices.includes(i) ? c : '_').join('');
+      }).join(' ');
+      break;
+    case 4:
+      const hardWords = [...new Set(words.filter(w => w.length > 6))].slice(0, 5);
+      hint = '📖 Key words:\n' + hardWords.map(w => `• ${w} (${w.length} letters)`).join('\n');
+      break;
+    case 5:
+      const uniqueWords = [...new Set(words.map(w => w.toLowerCase().replace(/[^a-z]/g, '')))].filter(w => w);
+      hint = '📝 Word Bank:\n' + uniqueWords.sort().join(' • ');
+      break;
+    case 6:
+      hintEl.innerHTML = `<div style="filter:blur(5px);user-select:none;">${escapeHtml(transcript)}</div><div style="margin-top:8px;font-size:12px;color:var(--text-muted);">💡 Blur removed - try not to peek!</div>`;
+      hintEl.classList.add('show');
+      return;
+  }
+
+  hintEl.textContent = hint;
+  hintEl.classList.add('show');
+  toast(`Hint ${state.hintLevel}/6 used`, 'info');
+}
+
+/* =========================================================
+   INPUT AUTOSAVE
+   ========================================================= */
+function autoResizeInput() {
+  const el = document.getElementById('dictInput');
+  el.style.height = 'auto';
+  el.style.height = el.scrollHeight + 'px';
+}
+
+document.getElementById('dictInput').addEventListener('input', function() {
+  if (state.currentLesson) {
+    localStorage.setItem('dict_input_' + state.currentLesson.id, this.value);
+    autoResizeInput();
+  }
+});
+
+function clearInput() {
+  document.getElementById('dictInput').value = '';
+  if (state.currentLesson) localStorage.removeItem('dict_input_' + state.currentLesson.id);
+  autoResizeInput();
+}
+
+/* =========================================================
+   CHECK ANSWER
+   ========================================================= */
+function checkAnswer() {
+  if (!state.currentLesson) return;
+  const userText = document.getElementById('dictInput').value.trim();
+  if (!userText) return toast('Please type something first', 'error');
+
+  const correct = state.currentLesson.transcript;
+  const userWords = userText.split(/\s+/);
+  const correctWords = correct.split(/\s+/);
+
+  let html = '';
+  let correctCount = 0;
+  const maxLen = Math.max(userWords.length, correctWords.length);
+
+  for (let i = 0; i < maxLen; i++) {
+    const u = userWords[i];
+    const c = correctWords[i];
+
+    if (u === undefined) {
+      html += `<span class="word-wrong" data-correct="${escapeHtml(c)}">[missing]</span> `;
+    } else if (c === undefined) {
+      html += `<span class="word-wrong" data-correct="">${escapeHtml(u)} </span>`;
+    } else if (normalizeWord(u) === normalizeWord(c)) {
+      html += `<span class="word-correct">${escapeHtml(u)}</span> `;
+      correctCount++;
+    } else {
+      html += `<span class="word-wrong" data-correct="${escapeHtml(c)}">${escapeHtml(u)}</span> `;
+    }
+  }
+
+  document.getElementById('resultText').innerHTML = html;
+
+  const accuracy = Math.round((correctCount / correctWords.length) * 100);
+  document.getElementById('liveAccuracy').textContent = accuracy + '%';
+
+  const baseScore = 100;
+  const hintPenalty = state.hintLevel * 2;
+  const replayPenalty = Math.max(0, state.replayCount - 1) * 1;
+  const errorPenalty = (correctWords.length - correctCount) * 5;
+  const finalScore = Math.max(0, baseScore - hintPenalty - replayPenalty - errorPenalty);
+
+  animateScore(finalScore);
+
+  document.getElementById('resultCard').classList.add('show');
+  document.getElementById('checkBtn').disabled = true;
+
+  if (state.timerInterval) clearInterval(state.timerInterval);
+
+  saveLessonResult({
+    lessonId: state.currentLesson.id,
+    lessonName: state.currentLesson.name,
+    accuracy,
+    score: finalScore,
+    hints: state.hintLevel,
+    replays: state.replayCount,
+    time: state.timerSeconds,
+    date: Date.now()
+  });
+
+  document.getElementById('resultCard').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function normalizeWord(w) {
+  return w.toLowerCase().replace(/[^a-z0-9']/g, '');
+}
+
+function animateScore(target) {
+  const el = document.getElementById('finalScore');
+  let current = 0;
+  const step = target / 30;
+  const interval = setInterval(() => {
+    current += step;
+    if (current >= target) {
+      current = target;
+      clearInterval(interval);
+    }
+    el.textContent = Math.round(current);
+  }, 20);
+}
+
+function retryLesson() {
+  document.getElementById('checkBtn').disabled = false;
+  loadDictation(state.currentLesson.id);
+}
+
+/* =========================================================
+   TEACHER STUDIO - GENERATE FILES
+   ========================================================= */
+function slugify(text) {
+  return text.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 50);
+}
+
+function updateLessonId() {
+  const name = document.getElementById('lessonName').value;
+  const slug = slugify(name);
+  document.getElementById('lessonId').value = slug;
+  document.getElementById('lessonAudioFile').value = slug + '.mp3';
+}
+
+function loadSampleData() {
+  document.getElementById('lessonName').value = 'TOEIC Listening 01 - Meeting Schedule';
+  updateLessonId();
+  document.getElementById('lessonTranscript').value = `Good morning everyone.
+Thank you for coming to this meeting.
+The meeting will start at nine tomorrow.
+Please sign the attendance sheet.`;
+  document.getElementById('lessonEmoji').value = '💼';
+  toast('Sample data loaded', 'success');
+}
+
+async function generateLessonFiles() {
+  const name = document.getElementById('lessonName').value.trim();
+  const id = document.getElementById('lessonId').value.trim();
+  const audioFile = document.getElementById('lessonAudioFile').value.trim();
+  const transcript = document.getElementById('lessonTranscript').value.trim();
+  const emoji = document.getElementById('lessonEmoji').value.trim() || '🎧';
+
+  if (!name) return toast('Please enter lesson name', 'error');
+  if (!id) return toast('Please enter lesson ID', 'error');
+  if (!/^[a-z0-9-]+$/.test(id)) return toast('Lesson ID must contain only a-z, 0-9, -', 'error');
+  if (!audioFile) return toast('Please enter audio file name', 'error');
+  if (!transcript) return toast('Please enter transcript', 'error');
+
+  // Try to load existing index.json
+  let existingIndex = [];
+  try {
+    const res = await fetch(CONFIG.INDEX_PATH + '?t=' + Date.now());
+    if (res.ok) {
+      existingIndex = await res.json();
+      if (!Array.isArray(existingIndex)) existingIndex = [];
+    }
+  } catch (e) { /* first time, no index yet */ }
+
+  // Build lesson JSON
+  const lessonJson = {
+    id,
+    name,
+    emoji,
+    audioFile,
+    transcript
+  };
+
+  // Build updated index
+  const indexEntry = {
+    id,
+    name,
+    emoji,
+    audioFile,
+    createdAt: Date.now()
+  };
+  // Remove existing entry with same id
+  const updatedIndex = existingIndex.filter(l => l.id !== id);
+  updatedIndex.unshift(indexEntry);
+
+  state.generatedLesson = lessonJson;
+  state.existingIndex = updatedIndex;
+
+  // Display
+  document.getElementById('lessonFileName').textContent = `${id}.json`;
+  document.getElementById('audioFilePath').textContent = `audio/${audioFile}`;
+  document.getElementById('lessonJsonPreview').textContent = JSON.stringify(lessonJson, null, 2);
+  document.getElementById('indexJsonPreview').textContent = JSON.stringify(updatedIndex, null, 2);
+
+  const shareUrl = window.location.origin + window.location.pathname + '#dictation/' + id;
+  document.getElementById('shareLinkDisplay').textContent = shareUrl;
+
+  // QR Code
+  const qrContainer = document.getElementById('qrCode');
+  qrContainer.innerHTML = '';
+  new QRCode(qrContainer, {
+    text: shareUrl, width: 180, height: 180,
+    colorDark: '#000000', colorLight: '#ffffff'
+  });
+
+  document.getElementById('generatedFiles').style.display = 'block';
+  document.getElementById('generatedFiles').scrollIntoView({ behavior: 'smooth' });
+
+  toast('Files generated! Download and place them in the correct folders.', 'success');
+}
+
+function downloadFile(content, filename) {
+  const blob = new Blob([content], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function downloadLessonJson() {
+  if (!state.generatedLesson) return;
+  downloadFile(
+    JSON.stringify(state.generatedLesson, null, 2),
+    `${state.generatedLesson.id}.json`
+  );
+  toast('Lesson JSON downloaded', 'success');
+}
+
+function downloadIndexJson() {
+  downloadFile(
+    JSON.stringify(state.existingIndex, null, 2),
+    'index.json'
+  );
+  toast('index.json downloaded', 'success');
+}
+
+function copyLessonJson() {
+  if (!state.generatedLesson) return;
+  navigator.clipboard.writeText(JSON.stringify(state.generatedLesson, null, 2))
+    .then(() => toast('Lesson JSON copied!', 'success'));
+}
+
+function copyIndexJson() {
+  navigator.clipboard.writeText(JSON.stringify(state.existingIndex, null, 2))
+    .then(() => toast('index.json copied!', 'success'));
+}
+
+function copyShareLink() {
+  const link = document.getElementById('shareLinkDisplay').textContent;
+  navigator.clipboard.writeText(link).then(() => toast('Link copied!', 'success'));
+}
+
+/* =========================================================
+   STATS & HISTORY
+   ========================================================= */
+function saveLessonResult(result) {
+  const today = new Date().toDateString();
+  if (state.lastActiveDate !== today) {
+    const yesterday = new Date(Date.now() - 86400000).toDateString();
+    if (state.lastActiveDate === yesterday) {
+      state.userStats.streak++;
+    } else if (state.lastActiveDate && state.lastActiveDate !== today) {
+      state.userStats.streak = 1;
+    } else {
+      state.userStats.streak = 1;
+    }
+    state.lastActiveDate = today;
+    localStorage.setItem('lastActiveDate', today);
+  }
+
+  state.userStats.xp += Math.round(result.score * 2.5);
+  state.userStats.lessons++;
+  state.userStats.accuracy.push(result.accuracy);
+  state.userStats.history.unshift(result);
+  if (state.userStats.history.length > 50) state.userStats.history = state.userStats.history.slice(0, 50);
+
+  localStorage.setItem('userStats', JSON.stringify(state.userStats));
+  renderHome();
+
+  if (result.accuracy === 100) toast('🏆 Perfect Dictation!', 'success');
+  if (state.userStats.streak >= 7) toast('🔥 7-day streak!', 'success');
+}
+
+function renderHome() {
+  document.getElementById('stat-streak').textContent = state.userStats.streak;
+  document.getElementById('stat-xp').textContent = state.userStats.xp;
+  document.getElementById('stat-lessons').textContent = state.userStats.lessons;
+  const avgAcc = state.userStats.accuracy.length
+    ? Math.round(state.userStats.accuracy.reduce((a,b)=>a+b,0) / state.userStats.accuracy.length)
+    : 0;
+  document.getElementById('stat-accuracy').textContent = avgAcc + '%';
+
+  const recent = state.userStats.history.slice(0, 3);
+  const container = document.getElementById('recentLessons');
+  if (recent.length === 0) {
+    container.innerHTML = `<div class="empty" style="grid-column:1/-1;"><div class="empty-icon">🎯</div><p>Start your first lesson to see it here</p></div>`;
+  } else {
+    container.innerHTML = recent.map(r => `
+      <div class="course-card" onclick="navigate('dictation', '${r.lessonId}')">
+        <div class="course-cover">🎧</div>
+        <div class="course-body">
+          <div class="course-title">${escapeHtml(r.lessonName)}</div>
+          <div class="course-meta">
+            <span>🎯 ${r.accuracy}%</span>
+            <span>⭐ ${r.score}</span>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+}
+
+function renderHistory() {
+  const container = document.getElementById('historyList');
+  const history = state.userStats.history;
+  if (history.length === 0) {
+    container.innerHTML = `<div class="empty"><div class="empty-icon">📭</div><p>No history yet</p></div>`;
+    return;
+  }
+  container.innerHTML = history.map(r => `
+    <div style="padding:14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+      <div>
+        <div style="font-weight:600;">${escapeHtml(r.lessonName)}</div>
+        <div style="font-size:12px;color:var(--text-muted);">${new Date(r.date).toLocaleString()}</div>
+      </div>
+      <div style="display:flex;gap:16px;font-size:13px;">
+        <span>🎯 ${r.accuracy}%</span>
+        <span>⭐ ${r.score}</span>
+        <span>💡 ${r.hints}</span>
+        <span>⏱️ ${formatTime(r.time)}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function resetAllData() {
+  if (!confirm('Are you sure? This will delete all your progress.')) return;
+  localStorage.removeItem('userStats');
+  localStorage.removeItem('lastActiveDate');
+  state.userStats = { xp: 0, streak: 0, lessons: 0, accuracy: [], history: [] };
+  state.lastActiveDate = null;
+  renderHome();
+  toast('All data reset', 'success');
+}
+
+/* =========================================================
+   UTILITIES
+   ========================================================= */
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function timeAgo(ts) {
+  if (!ts) return '';
+  const diff = Date.now() - ts;
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'just now';
+  if (mins < 60) return mins + 'm ago';
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return hours + 'h ago';
+  const days = Math.floor(hours / 24);
+  return days + 'd ago';
+}
+
+/* =========================================================
+   INIT
+   ========================================================= */
+renderHome();
+handleRoute();
+setTimeout(() => toast('Welcome to Learn with Ms. Thúy! 🎧', 'success'), 500);
+</script>
+
+</body>
+</html>
