@@ -1163,7 +1163,12 @@ async function loadDictation(lessonId) {
     document.getElementById('dictLessonTitle').textContent = lesson.name;
 
     // Setup audio
-    const audioUrl = CONFIG.AUDIO_PATH.replace('{file}', lesson.audioFile);
+    const audioUrl =
+window.location.origin +
+'/dictation/audio/' +
+lesson.audioFile;
+
+console.log(audioUrl);
     const audioEl = document.getElementById('audioEl');
     audioEl.src = audioUrl;
 
