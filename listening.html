@@ -101,17 +101,22 @@
         placeholder="Nghe và gõ những gì bạn nghe được..."
         oninput="autoResize(this)"></textarea>
 
-      <!-- Hint Display -->
-      <div class="hint-display show" id="hintDisplay"></div>
+      <!-- NEW HINT SYSTEM - Word by word -->
+      <div class="hint-section" id="hintSection">
+        <div class="hint-header">
+          <span class="hint-title">💡 Hint</span>
+          <span class="hint-counter" id="hintCounter">0/3</span>
+        </div>
+        <div class="hint-words-container" id="hintWordsContainer">
+          <!-- Các từ sẽ được render động -->
+        </div>
+      </div>
 
       <!-- Sentence Result -->
       <div class="sentence-result" id="sentenceResult"></div>
 
       <!-- Action Buttons -->
       <div class="action-row">
-        <button class="btn btn-ghost" id="hintBtn" onclick="useHint()">
-          💡 Hint <span class="hint-counter" id="hintCounter">0/3</span>
-        </button>
         <button class="btn btn-ghost" onclick="clearInput()">🗑️ Xóa</button>
         <button class="btn btn-primary" id="checkBtn" onclick="checkCurrentSentence()">✅ Kiểm tra</button>
         <button class="btn btn-success" id="nextBtn" onclick="nextSentence()" style="display:none;">
@@ -139,9 +144,9 @@
 const state = {
   lesson: null,
   currentSentenceIndex: 0,
-  results: [], // { sentenceId, userAnswer, isCorrect, hintsUsed }
+  results: [],
   hintsUsedThisSentence: 0,
-  revealedWords:[],
+  revealedWords: [], // Mảng các index đã reveal
   isPlaying: false,
   audioEl: null
 };
@@ -211,10 +216,9 @@ function loadCurrentSentence() {
   const sentence = state.lesson.sentences[state.currentSentenceIndex];
   if (!sentence) return;
 
-  // Reset state
+  // Reset hint state
   state.hintsUsedThisSentence = 0;
-  state.revealedWords=[];
-renderHintWords();
+  state.revealedWords = [];
 
   // Update UI
   document.getElementById('currentSentenceNum').textContent = state.currentSentenceIndex + 1;
@@ -227,63 +231,16 @@ renderHintWords();
   input.focus();
   autoResize(input);
 
-  // Hide hint & result
-  document.getElementById('hintDisplay').classList.remove('show');
-  document.getElementById('hintDisplay').textContent = '';
+  // Hide result
   document.getElementById('sentenceResult').classList.remove('show', 'correct', 'incorrect');
 
   // Update buttons
   document.getElementById('checkBtn').style.display = 'inline-flex';
   document.getElementById('checkBtn').disabled = false;
-  document.getElementById('hintBtn').disabled = false;
   document.getElementById('nextBtn').style.display = 'none';
 
-  // Update hint counter
-  updateHintCounter();
-  function renderHintWords(){
-
-const sentence=
-state.lesson.sentences[state.currentSentenceIndex];
-
-const words=
-sentence.text.split(/\s+/);
-
-let html="";
-
-words.forEach((w,i)=>{
-
-const show=
-state.revealedWords.includes(i);
-
-html+=`
-
-<div class="hint-word">
-
-<div class="hint-text">
-
-${show?w:"_".repeat(w.length)}
-
-</div>
-
-<button
-class="hint-word-btn"
-onclick="revealWord(${i})"
-${show||state.hintsUsedThisSentence>=3?"disabled":""}
->
-
-${show?"✓":"💡"}
-
-</button>
-
-</div>
-
-`;
-
-});
-
-document.getElementById("hintDisplay").innerHTML=html;
-
-}
+  // Render hint words
+  renderHintWords();
 
   // Update progress
   updateProgress();
@@ -299,15 +256,106 @@ function updateProgress() {
   document.getElementById('progressFill').style.width = percent + '%';
 }
 
-function updateHintCounter(){
-
-document.getElementById(
-"hintCounter"
-).textContent=
-
-state.hintsUsedThisSentence+"/3";
-
+function updateHintCounter() {
+  const maxHints = 3;
+  document.getElementById('hintCounter').textContent = `${state.hintsUsedThisSentence}/${maxHints}`;
 }
+
+// =========================================================
+// NEW HINT SYSTEM - Word by Word
+// =========================================================
+function renderHintWords() {
+  const sentence = state.lesson.sentences[state.currentSentenceIndex];
+  const words = sentence.text.split(/\s+/);
+  const container = document.getElementById('hintWordsContainer');
+  
+  container.innerHTML = '';
+  
+  words.forEach((word, index) => {
+    const wordItem = document.createElement('div');
+    wordItem.className = 'hint-word-item';
+    wordItem.dataset.index = index;
+    
+    // Word text (underline or revealed)
+    const wordText = document.createElement('div');
+    wordText.className = 'hint-word-text';
+    wordText.id = `hint-word-${index}`;
+    wordText.textContent = '_'.repeat(word.length);
+    
+    // Hint button
+    const hintBtn = document.createElement('button');
+    hintBtn.className = 'hint-word-btn';
+    hintBtn.id = `hint-btn-${index}`;
+    hintBtn.innerHTML = '👁️';
+    hintBtn.onclick = () => revealWord(index);
+    
+    wordItem.appendChild(wordText);
+    wordItem.appendChild(hintBtn);
+    container.appendChild(wordItem);
+  });
+  
+  updateHintCounter();
+}
+
+function revealWord(index) {
+  const maxHints = 3;
+  
+  // Check if already revealed
+  if (state.revealedWords.includes(index)) {
+    return;
+  }
+  
+  // Check if reached limit
+  if (state.hintsUsedThisSentence >= maxHints) {
+    toast('🚫 Bạn đã dùng hết 3 lượt Hint cho câu này.', 'warning');
+    return;
+  }
+  
+  // Reveal word
+  const sentence = state.lesson.sentences[state.currentSentenceIndex];
+  const words = sentence.text.split(/\s+/);
+  const word = words[index];
+  
+  const wordTextEl = document.getElementById(`hint-word-${index}`);
+  const hintBtnEl = document.getElementById(`hint-btn-${index}`);
+  
+  // Update text with animation
+  wordTextEl.textContent = word;
+  wordTextEl.classList.add('revealed');
+  
+  // Update button to checkmark
+  hintBtnEl.innerHTML = '✓';
+  hintBtnEl.classList.add('revealed');
+  hintBtnEl.disabled = true;
+  
+  // Add to revealed list
+  state.revealedWords.push(index);
+  state.hintsUsedThisSentence++;
+  
+  updateHintCounter();
+  
+  // If reached limit, disable all remaining buttons
+  if (state.hintsUsedThisSentence >= maxHints) {
+    disableAllHintButtons();
+  }
+  
+  toast(`💡 Đã mở từ "${word}"`, 'info');
+}
+
+function disableAllHintButtons() {
+  const sentence = state.lesson.sentences[state.currentSentenceIndex];
+  const words = sentence.text.split(/\s+/);
+  
+  words.forEach((word, index) => {
+    if (!state.revealedWords.includes(index)) {
+      const hintBtnEl = document.getElementById(`hint-btn-${index}`);
+      hintBtnEl.innerHTML = '🔒';
+      hintBtnEl.classList.add('locked');
+      hintBtnEl.disabled = true;
+    }
+  });
+}
+
 // =========================================================
 // CHECK SENTENCE
 // =========================================================
@@ -337,10 +385,12 @@ function checkCurrentSentence() {
   resultEl.className = 'sentence-result show ' + (isCorrect ? 'correct' : 'incorrect');
   resultEl.innerHTML = html;
 
-  // Disable input & check button
+  // Disable input & buttons
   document.getElementById('dictInput').disabled = true;
   document.getElementById('checkBtn').disabled = true;
-  document.getElementById('hintBtn').disabled = true;
+  
+  // Disable all hint buttons
+  disableAllHintButtons();
 
   // Show next button
   const isLastSentence = state.currentSentenceIndex >= state.lesson.sentences.length - 1;
@@ -390,7 +440,6 @@ function compareSentences(userText, correctText) {
 }
 
 function normalizeWord(w) {
-  // Bỏ dấu câu, lowercase, giữ lại apostrophe
   return w.toLowerCase().replace(/[.,!?;:"()\[\]{}]/g, '').trim();
 }
 
@@ -401,68 +450,26 @@ function nextSentence() {
   state.currentSentenceIndex++;
 
   if (state.currentSentenceIndex >= state.lesson.sentences.length) {
-    // Done - show final result
     showFinalResult();
   } else {
-    // Load next sentence
     loadCurrentSentence();
-    // Scroll to top of sentence card
     document.getElementById('sentenceCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 }
 
 // =========================================================
-// HINT SYSTEM
-// =========================================================
-function useHint(){
-
-toast(
-"💡 Hãy bấm vào từng nút Hint dưới mỗi từ",
-"info"
-);
-
-}
-function revealWord(index){
-
-if(state.hintsUsedThisSentence>=3){
-
-toast("🚫 Đã dùng hết 3 hint","warning");
-
-return;
-
-}
-
-if(state.revealedWords.includes(index)){
-
-return;
-
-}
-
-state.revealedWords.push(index);
-
-state.hintsUsedThisSentence++;
-
-updateHintCounter();
-
-renderHintWords();
-
-}
-// =========================================================
 // FINAL RESULT
 // =========================================================
 function showFinalResult() {
-  // Hide sentence card
   document.getElementById('sentenceCard').style.display = 'none';
 
-  // Calculate stats
   const totalSentences = state.lesson.sentences.length;
   const correctCount = state.results.filter(r => r.isCorrect).length;
   const incorrectCount = totalSentences - correctCount;
   const accuracy = Math.round((correctCount / totalSentences) * 100);
-  const score = Math.round((correctCount / totalSentences) * 10 * 10) / 10; // Thang 10
+  const score = Math.round((correctCount / totalSentences) * 10 * 10) / 10;
   const totalHints = state.results.reduce((sum, r) => sum + r.hintsUsed, 0);
 
-  // Build transcript HTML
   const transcriptHtml = state.lesson.sentences.map((s, i) => {
     const result = state.results[i];
     const lineClass = result.isCorrect ? 'correct-line' : 'incorrect-line';
@@ -480,7 +487,6 @@ function showFinalResult() {
     `;
   }).join('');
 
-  // Score message
   let scoreMessage = '';
   let scoreEmoji = '';
   if (score === 10) { scoreMessage = 'Xuất sắc! Perfect score!'; scoreEmoji = '🏆'; }
@@ -489,7 +495,6 @@ function showFinalResult() {
   else if (score >= 4) { scoreMessage = 'Cần cải thiện thêm!'; scoreEmoji = '📚'; }
   else { scoreMessage = 'Đừng nản, hãy thử lại nhé!'; scoreEmoji = '🌱'; }
 
-  // Render final result
   const resultContainer = document.getElementById('finalResult');
   resultContainer.style.display = 'block';
   resultContainer.innerHTML = `
@@ -538,10 +543,7 @@ function showFinalResult() {
     </div>
   `;
 
-  // Animate score
   animateScore(score);
-
-  // Scroll to result
   resultContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
@@ -554,7 +556,6 @@ function animateScore(target) {
   function update(now) {
     const elapsed = now - startTime;
     const progress = Math.min(elapsed / duration, 1);
-    // Ease out
     const eased = 1 - Math.pow(1 - progress, 3);
     current = target * eased;
     el.textContent = current.toFixed(1);
@@ -585,7 +586,6 @@ function setupAudioEvents() {
     document.getElementById('currentTime').textContent = formatTime(current);
     document.getElementById('duration').textContent = formatTime(duration);
 
-    // Update waveform
     const bars = document.querySelectorAll('.wave-bar');
     const progress = duration ? current / duration : 0;
     const activeCount = Math.floor(progress * bars.length);
@@ -687,13 +687,17 @@ function escapeHtml(s) {
 
 function toast(msg, type = 'info') {
   const container = document.getElementById('toastContainer');
+  if (!container) return;
+
   const el = document.createElement('div');
   el.className = `toast ${type}`;
   el.textContent = msg;
   container.appendChild(el);
+
   setTimeout(() => {
     el.style.opacity = '0';
     el.style.transform = 'translateX(100%)';
+    el.style.transition = 'all 0.3s ease';
     setTimeout(() => el.remove(), 300);
   }, 3000);
 }
