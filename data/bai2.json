@@ -1,0 +1,60 @@
+{
+  "id": "bai2",
+  "title": "At the Restaurant",
+  "audio": "audio/bai2.mp3",
+  "maxHints": 5,
+  "sentences": [
+    {
+      "id": 1,
+      "text": "Good evening, welcome to our restaurant.",
+      "translation": "Chào buổi tối, chào mừng đến nhà hàng của chúng tôi.",
+      "vocab": [
+        {"word": "evening", "meaning": "buổi tối"},
+        {"word": "welcome", "meaning": "chào mừng"},
+        {"word": "restaurant", "meaning": "nhà hàng"}
+      ]
+    },
+    {
+      "id": 2,
+      "text": "Could I see the menu, please?",
+      "translation": "Cho tôi xem thực đơn được không?",
+      "vocab": [
+        {"word": "menu", "meaning": "thực đơn"}
+      ]
+    },
+    {
+      "id": 3,
+      "text": "I would like to order a steak.",
+      "translation": "Tôi muốn gọi một miếng bít tết.",
+      "vocab": [
+        {"word": "order", "meaning": "gọi (món)"},
+        {"word": "steak", "meaning": "bít tết"}
+      ]
+    },
+    {
+      "id": 4,
+      "text": "How would you like your steak cooked?",
+      "translation": "Bạn muốn món bít tết được nấu như thế nào?",
+      "vocab": [
+        {"word": "cooked", "meaning": "được nấu"}
+      ]
+    },
+    {
+      "id": 5,
+      "text": "Medium rare, please.",
+      "translation": "Tái vừa, làm ơn.",
+      "vocab": [
+        {"word": "medium", "meaning": "vừa"},
+        {"word": "rare", "meaning": "tái"}
+      ]
+    },
+    {
+      "id": 6,
+      "text": "Can I have the bill, please?",
+      "translation": "Cho tôi xin hóa đơn được không?",
+      "vocab": [
+        {"word": "bill", "meaning": "hóa đơn"}
+      ]
+    }
+  ]
+}
