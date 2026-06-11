@@ -1,0 +1,54 @@
+{
+  "id": "bai1",
+  "title": "Daily Meeting",
+  "audio": "audio/bai1.mp3",
+  "maxHints": 5,
+  "sentences": [
+    {
+      "id": 1,
+      "text": "Good morning everyone.",
+      "translation": "Chào mọi người.",
+      "vocab": [
+        {"word": "morning", "meaning": "buổi sáng"},
+        {"word": "everyone", "meaning": "mọi người"}
+      ]
+    },
+    {
+      "id": 2,
+      "text": "Thank you for coming to this meeting.",
+      "translation": "Cảm ơn mọi người đã đến cuộc họp này.",
+      "vocab": [
+        {"word": "meeting", "meaning": "cuộc họp"},
+        {"word": "coming", "meaning": "đến"}
+      ]
+    },
+    {
+      "id": 3,
+      "text": "Today we will discuss the new project.",
+      "translation": "Hôm nay chúng ta sẽ thảo luận về dự án mới.",
+      "vocab": [
+        {"word": "discuss", "meaning": "thảo luận"},
+        {"word": "project", "meaning": "dự án"}
+      ]
+    },
+    {
+      "id": 4,
+      "text": "The meeting will start at nine tomorrow.",
+      "translation": "Cuộc họp sẽ bắt đầu lúc 9 giờ ngày mai.",
+      "vocab": [
+        {"word": "start", "meaning": "bắt đầu"},
+        {"word": "tomorrow", "meaning": "ngày mai"}
+      ]
+    },
+    {
+      "id": 5,
+      "text": "Please sign the attendance sheet.",
+      "translation": "Vui lòng ký vào bảng điểm danh.",
+      "vocab": [
+        {"word": "sign", "meaning": "ký"},
+        {"word": "attendance", "meaning": "điểm danh"},
+        {"word": "sheet", "meaning": "tờ giấy/bảng"}
+      ]
+    }
+  ]
+}
