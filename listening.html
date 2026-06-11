@@ -217,7 +217,8 @@ function renderWordInputs() {
     input.className = 'word-input';
     input.dataset.index = index;
     input.dataset.correct = word;
-    input.placeholder = '_'.repeat(word.length);
+    input.size=Math.max(word.length,2);
+input.placeholder="_".repeat(word.length);
     input.autocomplete = "off";
     input.spellcheck = false;
     
