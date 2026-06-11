@@ -580,14 +580,15 @@ h4 { font-size: 1.125rem; }
   cursor: not-allowed;
 }
 
+
 /* =========================================================
-   NEW HINT SYSTEM - Word by Word
+   WORD-BY-WORD INPUT SYSTEM (Thay thế Hint cũ)
    ========================================================= */
 .hint-section {
   margin-top: 20px;
-  padding: 20px;
-  background: linear-gradient(135deg, rgba(253, 230, 138, 0.15), rgba(253, 186, 116, 0.1));
-  border: 1px solid rgba(245, 158, 11, 0.2);
+  padding: 24px 20px;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.05), rgba(236, 72, 153, 0.05));
+  border: 1px solid rgba(139, 92, 246, 0.15);
   border-radius: var(--radius);
 }
 
@@ -595,13 +596,16 @@ h4 { font-size: 1.125rem; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
 .hint-title {
   font-weight: 700;
   font-size: 1rem;
   color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .hint-counter {
@@ -619,115 +623,129 @@ h4 { font-size: 1.125rem; }
 .hint-words-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 12px;
   justify-content: center;
-  align-items: flex-start;
+  align-items: flex-end; /* Căn dưới để nút eye thẳng hàng */
 }
 
-.hint-word-item {
+.word-input-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
   min-width: 60px;
+  position: relative;
 }
 
-.hint-word-text {
+/* Ô input gõ chữ */
+.word-input {
+  width: 100%;
+  min-width: 60px;
+  padding: 8px 4px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid var(--border-strong);
+  color: var(--text-primary);
   font-family: 'JetBrains Mono', monospace;
   font-size: 1rem;
   font-weight: 600;
-  color: var(--text-muted);
-  letter-spacing: 0.05em;
-  padding: 8px 12px;
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: 8px;
-  min-width: 40px;
   text-align: center;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
+  outline: none;
 }
 
-.hint-word-text.revealed {
+.word-input::placeholder {
+  color: var(--text-muted);
+  opacity: 0.5;
+  font-weight: 400;
+}
+
+.word-input:focus {
+  border-bottom-color: var(--primary);
+  background: rgba(139, 92, 246, 0.05);
+  transform: scale(1.05);
+}
+
+/* Khi từ được gợi ý bằng mắt */
+.word-input.revealed-by-hint {
   color: var(--primary);
+  border-bottom-color: var(--primary);
   background: rgba(139, 92, 246, 0.1);
-  animation: revealWord 0.5s ease;
+  font-weight: 700;
 }
 
-@keyframes revealWord {
-  0% {
-    opacity: 0;
-    transform: scale(0.9);
-    background: rgba(253, 230, 138, 0.5);
-  }
-  50% {
-    background: rgba(253, 230, 138, 0.5);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-    background: rgba(139, 92, 246, 0.1);
-  }
+/* Kết quả sau khi check */
+.word-input.input-correct {
+  border-bottom-color: var(--success);
+  color: var(--success);
+  background: rgba(16, 185, 129, 0.1);
 }
 
+.word-input.input-wrong {
+  border-bottom-color: var(--danger);
+  color: var(--danger);
+  background: rgba(239, 68, 68, 0.1);
+  text-decoration: line-through;
+}
+
+/* Nút con mắt / checkmark */
 .hint-word-btn {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
-  color: white;
-  font-size: 1rem;
+  background: var(--bg-card-solid);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.9rem;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+  transition: all 0.2s ease;
 }
 
 .hint-word-btn:hover:not(:disabled) {
-  transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
-}
-
-.hint-word-btn:active:not(:disabled) {
-  transform: scale(0.95);
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(139, 92, 246, 0.3);
 }
 
 .hint-word-btn.revealed {
-  background: linear-gradient(135deg, var(--success), #34d399);
+  background: var(--success);
+  color: white;
+  border-color: var(--success);
   cursor: default;
-  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
 }
 
 .hint-word-btn.locked {
-  background: linear-gradient(135deg, #94a3b8, #64748b);
+  background: var(--border);
+  color: var(--text-muted);
   cursor: not-allowed;
   opacity: 0.6;
-  box-shadow: none;
 }
 
 .hint-word-btn:disabled {
   cursor: not-allowed;
 }
 
-/* Responsive */
+/* Responsive cho mobile */
 @media (max-width: 768px) {
   .hint-words-container {
-    gap: 12px;
+    gap: 8px;
   }
-  
-  .hint-word-item {
+  .word-input-wrapper {
     min-width: 50px;
   }
-  
-  .hint-word-text {
+  .word-input {
     font-size: 0.9rem;
-    padding: 6px 10px;
+    padding: 6px 2px;
   }
-  
   .hint-word-btn {
-    width: 32px;
-    height: 32px;
-    font-size: 0.9rem;
+    width: 28px;
+    height: 28px;
+    font-size: 0.8rem;
   }
 }
 
