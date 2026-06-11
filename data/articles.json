@@ -1,0 +1,24 @@
+[
+  {
+    "id": "bai1",
+    "title": "Daily Meeting",
+    "description": "Cuộc họp hàng ngày về lịch trình làm việc",
+    "emoji": "💼",
+    "level": "Beginner",
+    "duration": "1:30",
+    "audio": "audio/bai1.mp3",
+    "dataFile": "data/bai1.json",
+    "color": "from-purple-400 to-pink-400"
+  },
+  {
+    "id": "bai2",
+    "title": "At the Restaurant",
+    "description": "Đặt món ăn tại nhà hàng",
+    "emoji": "🍽️",
+    "level": "Intermediate",
+    "duration": "2:15",
+    "audio": "audio/bai2.mp3",
+    "dataFile": "data/bai2.json",
+    "color": "from-blue-400 to-cyan-400"
+  }
+]
