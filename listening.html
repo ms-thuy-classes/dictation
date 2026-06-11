@@ -4,16 +4,13 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Luyện nghe - Learn with Ms.Thúy</title>
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-
 <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
-<!-- HEADER -->
 <header class="header">
   <div class="container">
     <div class="header-content">
@@ -29,19 +26,13 @@
   </div>
 </header>
 
-<!-- MAIN CONTENT -->
 <main class="listening-container">
-
-  <!-- Loading state -->
   <div id="loadingState" class="loading">
     <div class="spinner"></div>
     <div>Đang tải bài nghe...</div>
   </div>
 
-  <!-- Lesson content (ẩn ban đầu) -->
   <div id="lessonContent" style="display:none;">
-
-    <!-- Lesson Header with Progress -->
     <div class="lesson-header">
       <div class="lesson-title">
         <span id="lessonEmoji">🎧</span>
@@ -56,12 +47,15 @@
       </div>
     </div>
 
-    <!-- Audio Player -->
     <div class="audio-player">
       <div class="player-main">
         <button class="play-btn" id="playBtn" onclick="togglePlay()">▶</button>
         <div class="player-info">
-          <div class="waveform" id="waveform"></div>
+          <!-- THAY ĐỔI: Thêm waveform-container và time-tooltip -->
+          <div class="waveform-container" id="waveformContainer">
+            <div class="time-tooltip" id="timeTooltip">0:00</div>
+            <div class="waveform" id="waveform"></div>
+          </div>
           <div class="time-display">
             <span id="currentTime">0:00</span>
             <span id="duration">0:00</span>
@@ -85,7 +79,6 @@
       <audio id="audioEl" preload="metadata"></audio>
     </div>
 
-    <!-- Sentence Card -->
     <div class="sentence-card" id="sentenceCard">
       <div class="sentence-header">
         <div class="sentence-number">
@@ -95,27 +88,18 @@
         <div class="sentence-translation" id="sentenceTranslation"></div>
       </div>
 
-      <textarea
-        class="dictation-input"
-        id="dictInput"
-        placeholder="Nghe và gõ những gì bạn nghe được..."
-        oninput="autoResize(this)"></textarea>
+      <textarea class="dictation-input" id="dictInput" placeholder="Nghe và gõ những gì bạn nghe được..." oninput="autoResize(this)"></textarea>
 
-      <!-- NEW HINT SYSTEM - Word by word -->
       <div class="hint-section" id="hintSection">
         <div class="hint-header">
           <span class="hint-title">💡 Hint</span>
           <span class="hint-counter" id="hintCounter">0/3</span>
         </div>
-        <div class="hint-words-container" id="hintWordsContainer">
-          <!-- Các từ sẽ được render động -->
-        </div>
+        <div class="hint-words-container" id="hintWordsContainer"></div>
       </div>
 
-      <!-- Sentence Result -->
       <div class="sentence-result" id="sentenceResult"></div>
 
-      <!-- Action Buttons -->
       <div class="action-row">
         <button class="btn btn-ghost" onclick="clearInput()">🗑️ Xóa</button>
         <button class="btn btn-primary" id="checkBtn" onclick="checkCurrentSentence()">✅ Kiểm tra</button>
@@ -125,44 +109,28 @@
       </div>
     </div>
 
-    <!-- Final Result (ẩn ban đầu) -->
     <div id="finalResult" style="display:none;"></div>
-
   </div>
 </main>
 
-<!-- Toast container -->
 <div class="toast-container" id="toastContainer"></div>
 
 <script src="script.js"></script>
 <script>
-/* =========================================================
-   LISTENING PAGE LOGIC
-   ========================================================= */
-
-// State
 const state = {
   lesson: null,
   currentSentenceIndex: 0,
   results: [],
   hintsUsedThisSentence: 0,
-  revealedWords: [], // Mảng các index đã reveal
+  revealedWords: [],
   isPlaying: false,
   audioEl: null
 };
 
-// =========================================================
-// INIT - Load lesson data from URL params
-// =========================================================
 async function initLesson() {
   const params = new URLSearchParams(window.location.search);
-  const lessonId = params.get('id');
   const dataFile = params.get('data');
-
-  if (!dataFile) {
-    toast('Thiếu thông tin bài học', 'error');
-    return;
-  }
+  if (!dataFile) { toast('Thiếu thông tin bài học', 'error'); return; }
 
   try {
     const res = await fetch(dataFile + '?t=' + Date.now());
@@ -172,76 +140,21 @@ async function initLesson() {
     state.lesson = lesson;
     state.audioEl = document.getElementById('audioEl');
 
-    // Update UI
     document.title = `${lesson.title} - Learn with Ms.Thúy`;
     document.getElementById('lessonTitle').textContent = lesson.title;
     document.getElementById('lessonTitleMain').textContent = lesson.title;
-    document.getElementById('lessonEmoji').textContent = '🎧';
     document.getElementById('totalSentences').textContent = lesson.sentences.length;
 
-    // Setup audio
     state.audioEl.src = lesson.audio;
-
-    // Generate waveform
-  function generateWaveform(){
-
-    const waveform=document.getElementById("waveform");
-
-    waveform.innerHTML="";
-
-    const bars=60;
-
-    for(let i=0;i<bars;i++){
-
-        const bar=document.createElement("div");
-
-        bar.className="wave-bar";
-
-        bar.style.height=(20+Math.random()*80)+"%";
-
-        bar.dataset.index=i;
-
-        waveform.appendChild(bar);
-
-    }
-
-    waveform.onclick=seekByClick;
-
-}
-    function seekByClick(e){
-
-    const waveform=document.getElementById("waveform");
-
-    const rect=waveform.getBoundingClientRect();
-
-    const x=e.clientX-rect.left;
-
-    const percent=x/rect.width;
-
-    const audio=state.audioEl;
-
-    if(!audio.duration)return;
-
-    audio.currentTime=percent*audio.duration;
-
-    audio.play();
-
-    document.getElementById("playBtn").textContent="⏸";
-
-}
-
-    // Load first sentence
+    generateWaveform();
     loadCurrentSentence();
 
-    // Show content
     document.getElementById('loadingState').style.display = 'none';
     document.getElementById('lessonContent').style.display = 'block';
 
-    // Setup audio events
     setupAudioEvents();
-
-    // Setup speed buttons
     setupSpeedButtons();
+    setupInteractiveWaveform(); // <-- MỚI: Khởi tạo tương tác thanh audio
 
   } catch (e) {
     console.error(e);
@@ -255,39 +168,73 @@ async function initLesson() {
 }
 
 // =========================================================
+// MỚI: TƯƠNG TÁC THANH AUDIO (CLICK & HOVER)
+// =========================================================
+function setupInteractiveWaveform() {
+  const container = document.getElementById('waveformContainer');
+  const tooltip = document.getElementById('timeTooltip');
+  const audio = state.audioEl;
+
+  // 1. Click để tua (Seek)
+  container.addEventListener('click', (e) => {
+    if (!audio.duration || isNaN(audio.duration)) return;
+    const rect = container.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const ratio = Math.max(0, Math.min(1, clickX / rect.width));
+    audio.currentTime = ratio * audio.duration;
+    
+    // Nếu đang pause thì play luôn để trải nghiệm mượt hơn
+    if (audio.paused) {
+      audio.play().catch(() => {});
+      document.getElementById('playBtn').textContent = '⏸';
+      state.isPlaying = true;
+    }
+  });
+
+  // 2. Rê chuột hiển thị thời gian (Hover Tooltip)
+  container.addEventListener('mousemove', (e) => {
+    if (!audio.duration || isNaN(audio.duration)) return;
+    const rect = container.getBoundingClientRect();
+    const hoverX = e.clientX - rect.left;
+    const ratio = Math.max(0, Math.min(1, hoverX / rect.width));
+    const time = ratio * audio.duration;
+
+    tooltip.textContent = formatTime(time);
+    tooltip.style.left = `${hoverX}px`;
+    tooltip.classList.add('visible');
+  });
+
+  // 3. Rời chuột thì ẩn tooltip
+  container.addEventListener('mouseleave', () => {
+    tooltip.classList.remove('visible');
+  });
+}
+
+// =========================================================
 // SENTENCE MANAGEMENT
 // =========================================================
 function loadCurrentSentence() {
   const sentence = state.lesson.sentences[state.currentSentenceIndex];
   if (!sentence) return;
 
-  // Reset hint state
   state.hintsUsedThisSentence = 0;
   state.revealedWords = [];
 
-  // Update UI
   document.getElementById('currentSentenceNum').textContent = state.currentSentenceIndex + 1;
   document.getElementById('sentenceTranslation').textContent = '💭 ' + (sentence.translation || '');
 
-  // Reset input
   const input = document.getElementById('dictInput');
   input.value = '';
   input.disabled = false;
   input.focus();
   autoResize(input);
 
-  // Hide result
   document.getElementById('sentenceResult').classList.remove('show', 'correct', 'incorrect');
-
-  // Update buttons
   document.getElementById('checkBtn').style.display = 'inline-flex';
   document.getElementById('checkBtn').disabled = false;
   document.getElementById('nextBtn').style.display = 'none';
 
-  // Render hint words
   renderHintWords();
-
-  // Update progress
   updateProgress();
 }
 
@@ -295,39 +242,33 @@ function updateProgress() {
   const total = state.lesson.sentences.length;
   const current = state.currentSentenceIndex;
   const percent = Math.round((current / total) * 100);
-
   document.getElementById('progressText').textContent = `Câu ${current + 1}/${total}`;
   document.getElementById('progressPercent').textContent = percent + '%';
   document.getElementById('progressFill').style.width = percent + '%';
 }
 
 function updateHintCounter() {
-  const maxHints = 3;
-  document.getElementById('hintCounter').textContent = `${state.hintsUsedThisSentence}/${maxHints}`;
+  document.getElementById('hintCounter').textContent = `${state.hintsUsedThisSentence}/3`;
 }
 
 // =========================================================
-// NEW HINT SYSTEM - Word by Word
+// HINT SYSTEM
 // =========================================================
 function renderHintWords() {
   const sentence = state.lesson.sentences[state.currentSentenceIndex];
   const words = sentence.text.split(/\s+/);
   const container = document.getElementById('hintWordsContainer');
-  
   container.innerHTML = '';
   
   words.forEach((word, index) => {
     const wordItem = document.createElement('div');
     wordItem.className = 'hint-word-item';
-    wordItem.dataset.index = index;
     
-    // Word text (underline or revealed)
     const wordText = document.createElement('div');
     wordText.className = 'hint-word-text';
     wordText.id = `hint-word-${index}`;
     wordText.textContent = '_'.repeat(word.length);
     
-    // Hint button
     const hintBtn = document.createElement('button');
     hintBtn.className = 'hint-word-btn';
     hintBtn.id = `hint-btn-${index}`;
@@ -338,71 +279,51 @@ function renderHintWords() {
     wordItem.appendChild(hintBtn);
     container.appendChild(wordItem);
   });
-  
   updateHintCounter();
 }
 
 function revealWord(index) {
-  const maxHints = 3;
-  
-  // Check if already revealed
-  if (state.revealedWords.includes(index)) {
-    return;
-  }
-  
-  // Check if reached limit
-  if (state.hintsUsedThisSentence >= maxHints) {
+  if (state.revealedWords.includes(index)) return;
+  if (state.hintsUsedThisSentence >= 3) {
     toast('🚫 Bạn đã dùng hết 3 lượt Hint cho câu này.', 'warning');
     return;
   }
   
-  // Reveal word
   const sentence = state.lesson.sentences[state.currentSentenceIndex];
   const words = sentence.text.split(/\s+/);
-  const word = words[index];
   
   const wordTextEl = document.getElementById(`hint-word-${index}`);
   const hintBtnEl = document.getElementById(`hint-btn-${index}`);
   
-  // Update text with animation
-  wordTextEl.textContent = word;
+  wordTextEl.textContent = words[index];
   wordTextEl.classList.add('revealed');
-  
-  // Update button to checkmark
   hintBtnEl.innerHTML = '✓';
   hintBtnEl.classList.add('revealed');
   hintBtnEl.disabled = true;
   
-  // Add to revealed list
   state.revealedWords.push(index);
   state.hintsUsedThisSentence++;
-  
   updateHintCounter();
   
-  // If reached limit, disable all remaining buttons
-  if (state.hintsUsedThisSentence >= maxHints) {
-    disableAllHintButtons();
-  }
-  
-  toast(`💡 Đã mở từ "${word}"`, 'info');
+  if (state.hintsUsedThisSentence >= 3) disableAllHintButtons();
+  toast(`💡 Đã mở từ "${words[index]}"`, 'info');
 }
 
 function disableAllHintButtons() {
   const sentence = state.lesson.sentences[state.currentSentenceIndex];
   const words = sentence.text.split(/\s+/);
-  
-  words.forEach((word, index) => {
+  words.forEach((_, index) => {
     if (!state.revealedWords.includes(index)) {
-      const hintBtnEl = document.getElementById(`hint-btn-${index}`);
-      hintBtnEl.innerHTML = '🔒';
-      hintBtnEl.classList.add('locked');
-      hintBtnEl.disabled = true;
+      const btn = document.getElementById(`hint-btn-${index}`);
+      btn.innerHTML = '🔒';
+      btn.classList.add('locked');
+      btn.disabled = true;
     }
   });
 }
 
 // =========================================================
-// CHECK SENTENCE
+// MỚI: CHECK SENTENCE VỚI NGƯỠNG 80%
 // =========================================================
 function checkCurrentSentence() {
   const sentence = state.lesson.sentences[state.currentSentenceIndex];
@@ -413,41 +334,34 @@ function checkCurrentSentence() {
     return;
   }
 
-  // Compare
-  const { isCorrect, html } = compareSentences(userText, sentence.text);
+  const { isCorrect, html, accuracy } = compareSentences(userText, sentence.text);
 
-  // Save result
   state.results.push({
     sentenceId: sentence.id,
     userAnswer: userText,
     correctAnswer: sentence.text,
     isCorrect: isCorrect,
-    hintsUsed: state.hintsUsedThisSentence
+    hintsUsed: state.hintsUsedThisSentence,
+    accuracy: accuracy
   });
 
-  // Show result
   const resultEl = document.getElementById('sentenceResult');
   resultEl.className = 'sentence-result show ' + (isCorrect ? 'correct' : 'incorrect');
   resultEl.innerHTML = html;
 
-  // Disable input & buttons
   document.getElementById('dictInput').disabled = true;
   document.getElementById('checkBtn').disabled = true;
-  
-  // Disable all hint buttons
   disableAllHintButtons();
 
-  // Show next button
   const isLastSentence = state.currentSentenceIndex >= state.lesson.sentences.length - 1;
   const nextBtn = document.getElementById('nextBtn');
   nextBtn.style.display = 'inline-flex';
   nextBtn.textContent = isLastSentence ? '🏁 Xem kết quả' : 'Câu tiếp theo →';
 
-  // Toast
   if (isCorrect) {
-    toast('✅ Chính xác! Giỏi lắm!', 'success');
+    toast(`✅ Chính xác! (Độ chính xác: ${accuracy.toFixed(0)}%)`, 'success');
   } else {
-    toast('❌ Chưa đúng, xem đáp án bên dưới', 'error');
+    toast(`❌ Chưa đạt 80% (Hiện tại: ${accuracy.toFixed(0)}%)`, 'error');
   }
 }
 
@@ -475,25 +389,26 @@ function compareSentences(userText, correctText) {
     }
   }
 
-  const isCorrect = correctCount === correctWords.length && userWords.length === correctWords.length;
+  // LOGIC MỚI: Ngưỡng 80%
+  const accuracy = correctWords.length > 0 ? (correctCount / correctWords.length) * 100 : 0;
+  const isCorrect = accuracy >= 80; 
 
   if (!isCorrect) {
-    html += `<div class="correct-answer">✅ Đáp án đúng: <strong>${escapeHtml(correctText)}</strong></div>`;
+    html += `<div class="correct-answer">✅ Đáp án đúng: <strong>${escapeHtml(correctText)}</strong><br><small>(Độ chính xác của bạn: ${accuracy.toFixed(0)}% - Cần ≥ 80%)</small></div>`;
+  } else if (accuracy < 100) {
+    // Trường hợp đúng theo ngưỡng 80% nhưng không perfect 100%
+    html += `<div class="correct-answer" style="color: var(--warning);">⚠️ Chấp nhận (Độ chính xác: ${accuracy.toFixed(0)}%). Đáp án gốc: <strong>${escapeHtml(correctText)}</strong></div>`;
   }
 
-  return { isCorrect, html, correctCount, totalWords: correctWords.length };
+  return { isCorrect, html, correctCount, totalWords: correctWords.length, accuracy };
 }
 
 function normalizeWord(w) {
   return w.toLowerCase().replace(/[.,!?;:"()\[\]{}]/g, '').trim();
 }
 
-// =========================================================
-// NEXT SENTENCE
-// =========================================================
 function nextSentence() {
   state.currentSentenceIndex++;
-
   if (state.currentSentenceIndex >= state.lesson.sentences.length) {
     showFinalResult();
   } else {
@@ -525,15 +440,14 @@ function showFinalResult() {
         <div>
           <div>${escapeHtml(s.text)}</div>
           ${!result.isCorrect ? `<div style="font-size:0.85rem; color:var(--text-muted); margin-top:4px;">
-            Bạn gõ: <em>${escapeHtml(result.userAnswer)}</em>
+            Bạn gõ: <em>${escapeHtml(result.userAnswer)}</em> (${result.accuracy.toFixed(0)}%)
           </div>` : ''}
         </div>
       </div>
     `;
   }).join('');
 
-  let scoreMessage = '';
-  let scoreEmoji = '';
+  let scoreMessage = '', scoreEmoji = '';
   if (score === 10) { scoreMessage = 'Xuất sắc! Perfect score!'; scoreEmoji = '🏆'; }
   else if (score >= 8) { scoreMessage = 'Rất giỏi! Tiếp tục phát huy!'; scoreEmoji = '🌟'; }
   else if (score >= 6) { scoreMessage = 'Khá tốt! Cố gắng thêm nhé!'; scoreEmoji = '💪'; }
@@ -547,40 +461,21 @@ function showFinalResult() {
       <div style="font-size: 4rem; margin-bottom: 16px;">${scoreEmoji}</div>
       <h2 style="margin-bottom: 8px;">${scoreMessage}</h2>
       <p style="color: var(--text-secondary); margin-bottom: 24px;">Bạn đã hoàn thành bài nghe "${escapeHtml(state.lesson.title)}"</p>
-
       <div class="result-score">
         <div class="result-score-value" id="animatedScore">0</div>
         <div class="result-score-label">Điểm trên 10</div>
       </div>
-
       <div class="result-stats">
-        <div class="result-stat">
-          <div class="result-stat-value" style="color: var(--success);">${correctCount}</div>
-          <div class="result-stat-label">Câu đúng ✅</div>
-        </div>
-        <div class="result-stat">
-          <div class="result-stat-value" style="color: var(--danger);">${incorrectCount}</div>
-          <div class="result-stat-label">Câu sai ❌</div>
-        </div>
-        <div class="result-stat">
-          <div class="result-stat-value">${totalSentences}</div>
-          <div class="result-stat-label">Tổng số câu</div>
-        </div>
-        <div class="result-stat">
-          <div class="result-stat-value">${accuracy}%</div>
-          <div class="result-stat-label">Độ chính xác</div>
-        </div>
-        <div class="result-stat">
-          <div class="result-stat-value" style="color: var(--warning);">${totalHints}</div>
-          <div class="result-stat-label">Hint đã dùng 💡</div>
-        </div>
+        <div class="result-stat"><div class="result-stat-value" style="color: var(--success);">${correctCount}</div><div class="result-stat-label">Câu đúng ✅</div></div>
+        <div class="result-stat"><div class="result-stat-value" style="color: var(--danger);">${incorrectCount}</div><div class="result-stat-label">Câu sai ❌</div></div>
+        <div class="result-stat"><div class="result-stat-value">${totalSentences}</div><div class="result-stat-label">Tổng số câu</div></div>
+        <div class="result-stat"><div class="result-stat-value">${accuracy}%</div><div class="result-stat-label">Độ chính xác</div></div>
+        <div class="result-stat"><div class="result-stat-value" style="color: var(--warning);">${totalHints}</div><div class="result-stat-label">Hint đã dùng 💡</div></div>
       </div>
-
       <div class="full-transcript">
         <h3>📜 Full Transcript</h3>
         ${transcriptHtml}
       </div>
-
       <div class="action-row" style="justify-content: center; margin-top: 32px;">
         <button class="btn btn-primary" onclick="retryLesson()">🔁 Làm lại</button>
         <a href="index.html" class="btn btn-ghost">🏠 Về trang chủ</a>
@@ -594,16 +489,13 @@ function showFinalResult() {
 
 function animateScore(target) {
   const el = document.getElementById('animatedScore');
-  let current = 0;
   const duration = 1500;
   const startTime = performance.now();
-
   function update(now) {
     const elapsed = now - startTime;
     const progress = Math.min(elapsed / duration, 1);
     const eased = 1 - Math.pow(1 - progress, 3);
-    current = target * eased;
-    el.textContent = current.toFixed(1);
+    el.textContent = (target * eased).toFixed(1);
     if (progress < 1) requestAnimationFrame(update);
     else el.textContent = target.toFixed(1);
   }
@@ -624,7 +516,6 @@ function retryLesson() {
 // =========================================================
 function setupAudioEvents() {
   const audio = state.audioEl;
-
   audio.addEventListener('timeupdate', function() {
     const current = this.currentTime;
     const duration = this.duration || 0;
@@ -634,21 +525,15 @@ function setupAudioEvents() {
     const bars = document.querySelectorAll('.wave-bar');
     const progress = duration ? current / duration : 0;
     const activeCount = Math.floor(progress * bars.length);
-   bars.forEach((bar,i)=>{
+    bars.forEach((bar, i) => bar.classList.toggle('active', i < activeCount));
+  });
 
-bar.classList.toggle(
-"active",
-i<=activeCount
-);
-
-});
-
-  audio.addEventListener('ended', function() {
+  audio.addEventListener('ended', () => {
     document.getElementById('playBtn').textContent = '▶';
     state.isPlaying = false;
   });
 
-  audio.addEventListener('error', function() {
+  audio.addEventListener('error', () => {
     toast('⚠️ Không thể tải file audio. Kiểm tra thư mục audio/', 'error');
   });
 }
@@ -656,14 +541,9 @@ i<=activeCount
 function togglePlay() {
   const audio = state.audioEl;
   const btn = document.getElementById('playBtn');
-
   if (audio.paused) {
-    audio.play().then(() => {
-      btn.textContent = '⏸';
-      state.isPlaying = true;
-    }).catch(e => {
-      toast('Lỗi phát audio: ' + e.message, 'error');
-    });
+    audio.play().then(() => { btn.textContent = '⏸'; state.isPlaying = true; })
+      .catch(e => toast('Lỗi phát audio: ' + e.message, 'error'));
   } else {
     audio.pause();
     btn.textContent = '▶';
@@ -673,8 +553,8 @@ function togglePlay() {
 
 function seekAudio(seconds) {
   const audio = state.audioEl;
-  if (audio.src) {
-    audio.currentTime = Math.max(0, Math.min(audio.duration || 0, audio.currentTime + seconds));
+  if (audio.src && !isNaN(audio.duration)) {
+    audio.currentTime = Math.max(0, Math.min(audio.duration, audio.currentTime + seconds));
   }
 }
 
@@ -699,7 +579,7 @@ function setupSpeedButtons() {
 function generateWaveform() {
   const waveform = document.getElementById('waveform');
   waveform.innerHTML = '';
-  const bars = 60;
+  const bars = 80; // Tăng số lượng bar để mịn hơn
   for (let i = 0; i < bars; i++) {
     const bar = document.createElement('div');
     bar.className = 'wave-bar';
@@ -715,9 +595,6 @@ function formatTime(s) {
   return `${m}:${sec.toString().padStart(2, '0')}`;
 }
 
-// =========================================================
-// UTILITIES
-// =========================================================
 function autoResize(el) {
   el.style.height = 'auto';
   el.style.height = el.scrollHeight + 'px';
@@ -737,12 +614,10 @@ function escapeHtml(s) {
 function toast(msg, type = 'info') {
   const container = document.getElementById('toastContainer');
   if (!container) return;
-
   const el = document.createElement('div');
   el.className = `toast ${type}`;
   el.textContent = msg;
   container.appendChild(el);
-
   setTimeout(() => {
     el.style.opacity = '0';
     el.style.transform = 'translateX(100%)';
@@ -751,11 +626,7 @@ function toast(msg, type = 'info') {
   }, 3000);
 }
 
-// =========================================================
-// INIT
-// =========================================================
 initLesson();
 </script>
-
 </body>
 </html>
